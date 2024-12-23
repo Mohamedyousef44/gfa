@@ -1,0 +1,18 @@
+<?php
+define('GFA_HUB_FLIGHTS_PATH', plugin_dir_path(__FILE__));
+define('GFA_HUB_FLIGHTS_URL', plugin_dir_url(__FILE__));
+define('GFA_HUB_FLIGHTS_INCLUDES', GFA_HUB_FLIGHTS_PATH . 'includes/');
+
+// template paths
+define('GFA_HUB_FLIGHTS_TEMPLATES', GFA_HUB_FLIGHTS_PATH . 'templates/');
+define('GFA_HUB_FLIGHTS_TEMPLATES_ADMIN', GFA_HUB_FLIGHTS_TEMPLATES . 'admin/');
+define('GFA_HUB_FLIGHTS_TEMPLATES_FRONTEND', GFA_HUB_FLIGHTS_TEMPLATES . 'frontend/');
+define('GFA_HUB_FLIGHTS_TEMPLATES_EMAILS', GFA_HUB_FLIGHTS_TEMPLATES . 'emails/');
+
+// assets paths
+define('GFA_HUB_FLIGHTS_ASSETS', GFA_HUB_FLIGHTS_URL . 'assets/');
+define('GFA_HUB_FLIGHTS_ASSETS_JS', GFA_HUB_FLIGHTS_ASSETS . 'js/');
+define('GFA_HUB_FLIGHTS_ASSETS_CSS', GFA_HUB_FLIGHTS_ASSETS . 'css/');
+define('GFA_HUB_FLIGHTS_ASSETS_IMAGES', GFA_HUB_FLIGHTS_ASSETS . 'images/');
+
+define('TEXT_DOMAIN', 'GFA_HUB');

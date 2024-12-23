@@ -1,0 +1,16 @@
+:root {
+    --mainColor: #3F7FBC;
+}
+
+body {
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.passengerForm {
+    max-width: 500px;
+    border: 1px solid lightgrey;
+    padding: 25px;
+    border-radius: 20px;
+}
