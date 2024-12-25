@@ -39,9 +39,8 @@
             <input hidden name="flightDetails" value="" />
             <!-- Button trigger modal -->
             <button style="display:none;" type="button" class="add-more-bags btn btn-outline-secondary">
-                Add More Baggage
+                <?php _e("Add More Baggage", "GFA_HUB") ?>
             </button>
-
             <!-- Modal -->
             <div class="modal fade" id="BaggageModal" tabindex="-1" aria-labelledby="BaggageModal" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-baggage modal-dialog-centered">
@@ -50,7 +49,6 @@
                             <div class="d-flex justify-content-between w-100 align-items-center">
                                 <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">Baggage</h1>
                                 <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-
                             </div>
                             <h6 class=" text-white"><?php _e('Need To Carry a bit Extra?', "") ?></h6>
                         </div>

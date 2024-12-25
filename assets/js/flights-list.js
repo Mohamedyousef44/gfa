@@ -5,6 +5,7 @@ let finalePrice = null;
 let fareClass = null;
 var extraBags = {}
 var weightID;
+
 jQuery(document).ready(function ($) {
 
     $('.selectInput').select2({
@@ -142,25 +143,7 @@ jQuery(document).ready(function ($) {
         let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
         flightDetails.extraBag = selectedExtraBag
 
-        $.ajax(
-            {
-                url: wc_add_to_cart_params.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'flights_ajax_add_to_cart',
-                    trace_id: searchTraceId,
-                    purchase_id: purchaseId,
-                    flight_details: flightDetails,
-                },
-                success: function (response) {
-                    if (response.success) {
-                        window.location.href = response.data.checkout_url;
-                    } else {
-                        $('#offcanvasRight').offcanvas('hide');
-                        renderWooNotice([response.data.message], 'error', '.search-box')
-                    }
-                }
-            });
+        addFlightToCart(searchTraceId, purchaseId, flightDetails)
     });
 
     $(document).on('click', '#hold-flight', function (e) {
@@ -173,25 +156,7 @@ jQuery(document).ready(function ($) {
         let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
         flightDetails.extraBag = selectedExtraBag
 
-        $.ajax(
-            {
-                url: wc_add_to_cart_params.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'flights_ajax_add_to_cart',
-                    trace_id: searchTraceId,
-                    purchase_id: purchaseId,
-                    flight_details: flightDetails,
-                },
-                success: function (response) {
-                    if (response.success) {
-                        window.location.href = response.data.checkout_url;
-                    } else {
-                        $('#offcanvasRight').offcanvas('hide');
-                        renderWooNotice([response.data.message], 'error', '.search-box')
-                    }
-                }
-            });
+        addFlightToCart(searchTraceId, purchaseId, flightDetails)
     });
 
     // open modal of the extra bags
@@ -210,6 +175,14 @@ jQuery(document).ready(function ($) {
                         action: 'omdr_revalidate_flights',
                         trace_id: traceID,
                         purchase_id: purchaseID,
+                    },
+                    beforeSend: function () {
+                        // Show the loader before the request
+                        $('#gfa-hub-loader').show();
+                    },
+                    complete: function () {
+                        // hide the loader before the request
+                        $('#gfa-hub-loader').hide();
                     },
                     success: function (response) {
                         if (response.success) {
@@ -247,12 +220,12 @@ jQuery(document).ready(function ($) {
                                             });
 
                                             let element = `
-                                                    <div class="bag-item">
-                                                        <p class="city-pair">City Pair: ${cityPair}</p>
-                                                        <p class="weight-description">Weight: ${weight}</p>
-                                                        <p class="weight-price">Amount: ${amount} SAR</p>
-                                                        <input name="weight-id" type="radio" data-amount=${amount} value="${weightID}">
-                                                    </div>`;
+                                                <div class="bag-item">
+                                                    <p class="city-pair">City Pair: ${cityPair}</p>
+                                                    <p class="weight-description">Weight: ${weight}</p>
+                                                    <p class="weight-price">Amount: ${amount} SAR</p>
+                                                    <input name="weight-id" type="radio" data-amount="${amount}" value="${weightID}">
+                                                </div>`;
                                             $container.append(element);
                                         }
                                     }
@@ -260,9 +233,17 @@ jQuery(document).ready(function ($) {
                             }
 
                             // If no baggage services were found
-                            if (!hasBaggage) {
+                            if (hasBaggage) {
+                                $container.append(`
+                                    <div class="bag-item">
+                                        <p class="weight-description">No Extra Baggage</p>
+                                        <input name="weight-id" type="radio" value="none">
+                                    </div>
+                                `);
+                            } else {
                                 $container.append(`<p>No Extra bags for this flight</p>`);
                             }
+
                         } else {
                             // Handle error case
                             renderWooNotice([response.message], 'error');
@@ -274,7 +255,17 @@ jQuery(document).ready(function ($) {
     });
 
     $(document).on('input', "input[name='weight-id']", function (e) {
-        weightID = $(this).val();
+        $(document).on('input', "input[name='weight-id']", function (e) {
+            // Get the selected value
+            let selectedValue = $(this).val();
+
+            // Check if "None" is selected
+            if (selectedValue === "none") {
+                weightID = 0;
+            } else {
+                weightID = selectedValue;
+            }
+        });
     });
 
 });
@@ -815,6 +806,28 @@ function getFlightTotalPriceSingleFare(fare, passengersCount) {
     });
 
     return totalPrice;
+}
+
+function addFlightToCart(searchTraceId, purchaseId, flightDetails) {
+    $.ajax(
+        {
+            url: wc_add_to_cart_params.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'flights_ajax_add_to_cart',
+                trace_id: searchTraceId,
+                purchase_id: purchaseId,
+                flight_details: flightDetails,
+            },
+            success: function (response) {
+                if (response.success) {
+                    window.location.href = response.data.checkout_url;
+                } else {
+                    $('#offcanvasRight').offcanvas('hide');
+                    renderWooNotice([response.data.message], 'error', '.search-box')
+                }
+            }
+        });
 }
 
 //Baggage JS 
