@@ -38,7 +38,7 @@
             <input hidden name="purchaseIds" value="" />
             <input hidden name="flightDetails" value="" />
             <!-- Button trigger modal -->
-            <button style="display:none;" id="add-more-bags" type="button" class="btn btn-outline-secondary">
+            <button style="display:none;" type="button" class="add-more-bags btn btn-outline-secondary">
                 Add More Baggage
             </button>
 
@@ -54,49 +54,19 @@
                             </div>
                             <h6 class=" text-white">Need To Carry a bit Extra?</h6>
                         </div>
-                        <div class="modal-body row  gap-4 justify-content-between">
-                            <div class="d-flex col-md-3  flex-column col-12 flex-fill justify-content-center  align-items-center">
-                                <div class="d-flex   justify-content-center  align-items-center">
-
-                                    <button class="btn btn-outline-dark decrement" data-id="15" data-price="90">-</button>
-                                    <img src="https://omdrgate.com/wp-content/uploads/2024/12/rb_4831.png" width="75px" alt="">
-                                    <button class="btn btn-outline-dark increment" data-id="15" data-price="90">+</button>
+                        <div class="modal-body row gap-4 justify-content-between">
+                            <div class="extra-bags">
+                                <div class="bag-item">
+                                    <p class="city-pair">City Pair: CAIJED</p>
+                                    <p class="weight-description">Weight: 10Kg</p>
+                                    <p class="weight-price">Amount: 18.52 SAR</p>
+                                    <input type="radio" value="SCI_0KG&1_CAIJED">
                                 </div>
-                                <b>15Kg</b>
-                                <div class="d-flex align-items-center gap-1">
-
-                                    <span class="counter" data-id="15">0</span>
-                                    <span>x</span>
-                                    <b> 90.00 Sar</b>
-                                </div>
-                            </div>
-                            <div class="d-flex col-md-3 flex-column  col-12 flex-fill justify-content-center  align-items-center">
-                                <div class="d-flex   justify-content-center  align-items-center">
-
-                                    <button class="btn btn-outline-dark decrement" data-id="20" data-price="153">-</button>
-                                    <img src="https://omdrgate.com/wp-content/uploads/2024/12/rb_4831.png" width="75px" alt="">
-                                    <button class="btn btn-outline-dark increment" data-id="20" data-price="153">+</button>
-                                </div>
-                                <b>20Kg</b>
-                                <div class="d-flex align-items-center gap-1">
-
-                                    <span class="counter" data-id="20">0</span>
-                                    <span>x</span>
-                                    <b> 153.00 Sar</b>
-                                </div>
-                            </div>
-                            <div class="d-flex col-md-3  flex-column col-12 flex-fill justify-content-center  align-items-center">
-                                <div class="d-flex   justify-content-center  align-items-center">
-                                    <button class="btn btn-outline-dark decrement" data-id="25" data-price="213">-</button>
-                                    <img src="https://omdrgate.com/wp-content/uploads/2024/12/rb_4831.png" width="75px" alt="">
-                                    <button class="btn btn-outline-dark increment" data-id="25" data-price="213">+</button>
-                                </div>
-                                <b>25Kg</b>
-                                <div class="d-flex align-items-center gap-1">
-
-                                    <span class="counter" data-id="25">0</span>
-                                    <span>x</span>
-                                    <b> 213.00 Sar</b>
+                                <div class="bag-item">
+                                    <p class="city-pair">City Pair: CAIJED</p>
+                                    <p class="weight-description">Weight: 30Kg</p>
+                                    <p class="weight-price">Amount: 28.52 SAR</p>
+                                    <input type="radio" value="SCI_0KG&1_CAIJED">
                                 </div>
                             </div>
                         </div>

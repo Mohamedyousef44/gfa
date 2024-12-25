@@ -268,6 +268,7 @@ function createFlightCards(flights) {
     // Loop through filtered flights and create cards
     flights.forEach((flight, indx) => {
         // Extract segment and fare group details
+        console.log(flight.vendor)
         let isPaidBags = flight.vendor == "AT";
         const segment = flight.segGroups[0];
         const fareGroup = flight.fareGroups[0];
@@ -538,12 +539,12 @@ function renderOffcanvas(flightDetails) {
     }
 
     if (flightDetails.isPaidBags) {
-        $('#add-more-bags').show()
+        $('.add-more-bags').show()
     } else {
-        $('#add-more-bags').hide()
+        $('.add-more-bags').hide()
     }
 
-    $(document).on('click', '#add-more-bags', function (e) {
+    $(document).on('click', '.add-more-bags', function (e) {
 
         let purchaseID = selectedPurchaseId;
         let traceID = localStorage.getItem("flightSearchTraceId");
@@ -562,15 +563,39 @@ function renderOffcanvas(flightDetails) {
                     },
                     success: function (response) {
                         if (response.success) {
-                            window.location.href = response.data.checkout_url;
+                            // Open the modal
+                            $('#BaggageModal').modal('show');
+                            let data = response.data
+                            if (data.length) {
+                                let $container = $('.extra-bags')
+                                data.forEach((service) => {
+                                    if (service.additionalServiceType === "Baggage") {
+                                        let cityPair = service.cityPair
+                                        let weight = service.serviceDescription
+                                        let weightID = service.freeText
+                                        let amount = service.flightFares[0].amount
+                                        console.log({ cityPair, weight, weightID, amount })
+                                        if (weight && weightID && amount) {
+                                            let element = `<div class="bag-item">
+                                                <p class="city-pair">City Pair: ${cityPair}</p>
+                                                <p class="weight-description">Weight: ${weight}</p>
+                                                <p class="weight-price">Amount: ${amount} SAR</p>
+                                                <input type="radio" value="${weightID}">
+                                            </div>`
+                                            $container.append(element)
+                                        }
+                                    } else {
+                                        $container.append(`<p>No Extra bags for this flight</p>`)
+                                    }
+                                })
+                            } else {
+                                $container.append(`<p>No Extra bags for this flight</p>`)
+                            }
                         } else {
-                            $('#offcanvasRight').offcanvas('hide');
-                            renderWooNotice([response.data.message], 'error', '.search-box')
+                            renderWooNotice([response.message], 'error')
                         }
                     }
                 });
-            // Open the modal
-            $('#BaggageModal').modal('show');
         }
     });
 

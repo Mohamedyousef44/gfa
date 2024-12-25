@@ -300,7 +300,8 @@ class Flight_Ajax_Handler
             error_log(json_encode($response));
             // Check the API response code
             if ($response['code'] == 200) {
-                $response_data["data"] = $response["data"]["additionalServices"] ?? [];
+                $response_data["data"] = $response["data"]["flights"][0]["additionalServices"] ?? [];
+                error_log(json_encode($response_data["data"]));
             } else {
                 throw new Exception(__("There is issue happened please try again later", TEXT_DOMAIN));
             }
