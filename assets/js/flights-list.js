@@ -268,7 +268,7 @@ function createFlightCards(flights) {
     // Loop through filtered flights and create cards
     flights.forEach((flight, indx) => {
         // Extract segment and fare group details
-        let isPaidBags = flight.content == "LLC";
+        let isPaidBags = flight.vendor == "AT";
         const segment = flight.segGroups[0];
         const fareGroup = flight.fareGroups[0];
         const cabinClass = fareGroup.segInfos[0].cabinClass;
@@ -542,6 +542,38 @@ function renderOffcanvas(flightDetails) {
     } else {
         $('#add-more-bags').hide()
     }
+
+    $(document).on('click', '#add-more-bags', function (e) {
+
+        let purchaseID = selectedPurchaseId;
+        let traceID = localStorage.getItem("flightSearchTraceId");
+
+        // Check if both purchaseID and traceID have data
+        if (purchaseID && traceID) {
+
+            $.ajax(
+                {
+                    url: wc_add_to_cart_params.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'omdr_revalidate_flights',
+                        trace_id: traceID,
+                        purchase_id: purchaseID,
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.data.checkout_url;
+                        } else {
+                            $('#offcanvasRight').offcanvas('hide');
+                            renderWooNotice([response.data.message], 'error', '.search-box')
+                        }
+                    }
+                });
+            // Open the modal
+            $('#BaggageModal').modal('show');
+        }
+    });
+
 
     // Select and clear the container
     const flightInfoContainer = $("#flight-info-container");

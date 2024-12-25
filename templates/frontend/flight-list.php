@@ -38,7 +38,7 @@
             <input hidden name="purchaseIds" value="" />
             <input hidden name="flightDetails" value="" />
             <!-- Button trigger modal -->
-            <button style="display:none;" id="add-more-bags" type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#BaggageModal">
+            <button style="display:none;" id="add-more-bags" type="button" class="btn btn-outline-secondary">
                 Add More Baggage
             </button>
 
