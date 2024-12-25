@@ -8,7 +8,7 @@
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasRight"
         aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel"><?php _e("Flight Details", TEXT_DOMAIN) ?></h5>
+            <h5 class="offcanvas-title" id="offcanvasRightLabel"><?php _e("Flight Details", "GFA_HUB") ?></h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body d-flex flex-column gap-3">
@@ -18,7 +18,7 @@
             <!-- Pricing Details -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4><?php _e("Pricing", TEXT_DOMAIN) ?></h4>
+                    <h4><?php _e("Pricing", "GFA_HUB") ?></h4>
                     <img src="<?php echo GFA_HUB_FLIGHTS_ASSETS_IMAGES . 'cash2.png' ?>" width="50px" alt="pricing">
                 </div>
                 <ul class="list-group list-group-flush" id="pricing-details-container"></ul>
@@ -27,7 +27,7 @@
             <!-- Baggage Information -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4><?php _e("Baggage", TEXT_DOMAIN) ?></h4>
+                    <h4><?php _e("Baggage", "GFA_HUB") ?></h4>
                     <img src="<?php echo GFA_HUB_FLIGHTS_ASSETS_IMAGES . '1573537-200.png' ?>" width="50px" alt="baggage">
                 </div>
                 <ul id="baggage-list" class="list-group list-group-flush"></ul>
@@ -52,37 +52,17 @@
                                 <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
 
                             </div>
-                            <h6 class=" text-white">Need To Carry a bit Extra?</h6>
+                            <h6 class=" text-white"><?php _e('Need To Carry a bit Extra?', "") ?></h6>
                         </div>
                         <div class="modal-body row gap-4 justify-content-between">
-                            <div class="extra-bags">
-                                <div class="bag-item">
-                                    <p class="city-pair">City Pair: CAIJED</p>
-                                    <p class="weight-description">Weight: 10Kg</p>
-                                    <p class="weight-price">Amount: 18.52 SAR</p>
-                                    <input name="weight-id" type="radio" value="SCI_0KG&1_CAIJED">
-                                </div>
-                                <div class="bag-item">
-                                    <p class="city-pair">City Pair: CAIJED</p>
-                                    <p class="weight-description">Weight: 30Kg</p>
-                                    <p class="weight-price">Amount: 28.52 SAR</p>
-                                    <input type="radio" value="SCI_0KG&1_CAIJED">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer flex-column ">
-                            <div class="d-flex align-items-center w-100 justify-content-between">
-                                <h2 class="m-0 p-0">Total :</h2>
-                                <h5 class="m-0 p-0" id="totalBaggage">0 Sar</h5>
-                            </div>
-
+                            <div class="extra-bags"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="btn-group" role="group" aria-label="Basic outlined example">
-                <button type="button" class="btn btn-outline-primary" id="add-flight-to-cart"><?php _e("BOOK NOW", TEXT_DOMAIN) ?></button>
-                <button style="display:none;" type="button" class="btn btn-outline-warning border border-start-0" id="hold-flight"><?php _e("Hold Ticket", TEXT_DOMAIN) ?></button>
+                <button type="button" class="btn btn-outline-primary" id="add-flight-to-cart"><?php _e("BOOK NOW", "GFA_HUB") ?></button>
+                <button style="display:none;" type="button" class="btn btn-outline-warning border border-start-0" id="hold-flight"><?php _e("Hold Ticket", "GFA_HUB") ?></button>
             </div>
         </div>
     </div>

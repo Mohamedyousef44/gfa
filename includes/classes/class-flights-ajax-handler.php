@@ -30,7 +30,7 @@ class Flight_Ajax_Handler
         // Initial response data
         $response_data = array(
             "success" => true,
-            "message" => __("Flights retrieved successfully", TEXT_DOMAIN),
+            "message" => __("Flights retrieved successfully", "GFA_HUB"),
         );
 
         try {
@@ -95,13 +95,13 @@ class Flight_Ajax_Handler
                 // Validation errors from API - Return these to the user
                 wp_send_json_error([
                     'success' => false,
-                    'message' => __("Validation error(s) from API.", TEXT_DOMAIN),
+                    'message' => __("Validation error(s) from API.", "GFA_HUB"),
                     'errors'  => $response['data']
                 ]);
                 return;
             } else {
                 // Other errors - Raise an exception with a user-friendly message
-                throw new Exception(__("No flights found. Please try again with different criteria.", TEXT_DOMAIN));
+                throw new Exception(__("No flights found. Please try again with different criteria.", "GFA_HUB"));
             }
         } catch (Exception $e) {
             // Handle exceptions with a JSON error response
@@ -129,7 +129,7 @@ class Flight_Ajax_Handler
             $guest_token = sanitize_text_field($_POST['guestToken'] ?? '');
 
             if (!$order_id || !$flight_order_id) {
-                throw new Exception(__("Invalid order or flight reference ID.", TEXT_DOMAIN));
+                throw new Exception(__("Invalid order or flight reference ID.", "GFA_HUB"));
             }
 
             // Validate if the order belongs to the user (either logged-in or guest with a valid token)
@@ -148,19 +148,19 @@ class Flight_Ajax_Handler
             // Check the API response code
             if ($response['code'] == 200) {
                 if (isset($response['data']) && $response['data']['isCancelled']) {
-                    $response_data['message'] = __("Flight has been cancelled successfully", TEXT_DOMAIN);
+                    $response_data['message'] = __("Flight has been cancelled successfully", "GFA_HUB");
                     $this->process_refund($order_id, __("User Cancelled His flight"));
                     update_post_meta($order_id, 'flight_status', 'cancelled');
                 } else {
-                    throw new Exception(__("Cancellation failed. Please check the details and try again.", TEXT_DOMAIN));
+                    throw new Exception(__("Cancellation failed. Please check the details and try again.", "GFA_HUB"));
                 }
             } elseif ($response['code'] == 400) {
                 $response_data = array(
                     "success" => false,
-                    "message" => __("Cancellation failed. Please check the details and try again.", TEXT_DOMAIN)
+                    "message" => __("Cancellation failed. Please check the details and try again.", "GFA_HUB")
                 );
             } else {
-                throw new Exception(__("An error occurred during cancellation. Please try again later.", TEXT_DOMAIN));
+                throw new Exception(__("An error occurred during cancellation. Please try again later.", "GFA_HUB"));
             }
         } catch (Exception $e) {
             // Handle exceptions and return a JSON error response
@@ -188,7 +188,7 @@ class Flight_Ajax_Handler
             $guest_token = sanitize_text_field($_POST['guestToken'] ?? '');
 
             if (!$order_id || !$flight_order_id) {
-                throw new Exception(__("Invalid order or flight reference ID.", TEXT_DOMAIN));
+                throw new Exception(__("Invalid order or flight reference ID.", "GFA_HUB"));
             }
 
             // Validate if the order belongs to the user (either logged-in or guest with a valid token)
@@ -204,15 +204,15 @@ class Flight_Ajax_Handler
 
             // Check the API response code
             if ($response['code'] == 200) {
-                $response_data['message'] = __("Flight has been Confirmed successfully", TEXT_DOMAIN);
+                $response_data['message'] = __("Flight has been Confirmed successfully", "GFA_HUB");
                 update_post_meta($order_id, 'flight_status', 'confirmed');
             } elseif ($response['code'] == 400) {
                 $response_data = array(
                     "success" => false,
-                    "message" => __("Flight confirmation failed. Please try again later.", TEXT_DOMAIN)
+                    "message" => __("Flight confirmation failed. Please try again later.", "GFA_HUB")
                 );
             } else {
-                throw new Exception(__("An error occurred during confirmation. Please try again later.", TEXT_DOMAIN));
+                throw new Exception(__("An error occurred during confirmation. Please try again later.", "GFA_HUB"));
             }
         } catch (Exception $e) {
             // Handle exceptions and return a JSON error response
@@ -240,7 +240,7 @@ class Flight_Ajax_Handler
             $order = wc_get_order($order_id);
 
             if (!$order) {
-                throw new Exception(__("There is no data for this flight", TEXT_DOMAIN));
+                throw new Exception(__("There is no data for this flight", "GFA_HUB"));
             }
 
             $trace_id = get_post_meta($order_id, "flight_trace_id", true);
@@ -260,7 +260,7 @@ class Flight_Ajax_Handler
             if ($response['code'] == 200) {
                 $response_data["data"] = $response["data"]["segGroups"] ?? [];
             } else {
-                throw new Exception(__("There is no data for this flight", TEXT_DOMAIN));
+                throw new Exception(__("There is no data for this flight", "GFA_HUB"));
             }
         } catch (Exception $e) {
             // Handle exceptions and return a JSON error response
@@ -286,7 +286,7 @@ class Flight_Ajax_Handler
             $purchase_id = isset($_POST['purchase_id']) ? ($_POST['purchase_id']) : "";
 
             if (empty($trace_id) || empty($purchase_id)) {
-                throw new Exception(__("there is some data missing", TEXT_DOMAIN));
+                throw new Exception(__("there is some data missing", "GFA_HUB"));
             }
 
             // Prepare data to send to the API
@@ -303,7 +303,7 @@ class Flight_Ajax_Handler
                 $response_data["data"] = $response["data"]["flights"][0]["additionalServices"] ?? [];
                 error_log(json_encode($response_data["data"]));
             } else {
-                throw new Exception(__("There is issue happened please try again later", TEXT_DOMAIN));
+                throw new Exception(__("There is issue happened please try again later", "GFA_HUB"));
             }
         } catch (Exception $e) {
             // Handle exceptions and return a JSON error response
@@ -337,7 +337,7 @@ class Flight_Ajax_Handler
         // Check for missing fields
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
-                $errors[] = sprintf(__("%s is required.", TEXT_DOMAIN), ucfirst($field));
+                $errors[] = sprintf(__("%s is required.", "GFA_HUB"), ucfirst($field));
             }
         }
 
@@ -347,7 +347,7 @@ class Flight_Ajax_Handler
 
             // Check if the date format is valid
             if (!$departure_date || $departure_date->format('Y-m-d') !== $_POST['departureDateTime']) {
-                $errors[] = __("Invalid departure date format. Use YYYY-MM-DD.", TEXT_DOMAIN);
+                $errors[] = __("Invalid departure date format. Use YYYY-MM-DD.", "GFA_HUB");
             } else {
                 // Get today's date with no time component for accurate comparison
                 $today = new DateTime();
@@ -355,7 +355,7 @@ class Flight_Ajax_Handler
 
                 // Validate if the departure date is today or later
                 if ($departure_date < $today) {
-                    $errors[] = __("Departure date must be today or a future date.", TEXT_DOMAIN);
+                    $errors[] = __("Departure date must be today or a future date.", "GFA_HUB");
                 }
             }
         }
@@ -366,36 +366,36 @@ class Flight_Ajax_Handler
 
             // Check if the date format is valid
             if (!$return_date || $return_date->format('Y-m-d') !== $_POST['returnDateTime']) {
-                $errors[] = __("Invalid departure date format. Use YYYY-MM-DD.", TEXT_DOMAIN);
+                $errors[] = __("Invalid departure date format. Use YYYY-MM-DD.", "GFA_HUB");
             } else {
                 // Get today's date with no time component for accurate comparison
                 $departure_date = DateTime::createFromFormat('Y-m-d', $_POST['departureDateTime']);
 
                 // Validate if the departure date is today or later
                 if ($return_date < $departure_date) {
-                    $errors[] = __("Return date must be greater than departure Date.", TEXT_DOMAIN);
+                    $errors[] = __("Return date must be greater than departure Date.", "GFA_HUB");
                 }
             }
         }
 
         // Adult count validation
         if (!empty($_POST['adultCount']) && (!is_numeric($_POST['adultCount']) || intval($_POST['adultCount']) < 1)) {
-            $errors[] = __("Adult count must be a positive integer.", TEXT_DOMAIN);
+            $errors[] = __("Adult count must be a positive integer.", "GFA_HUB");
         }
 
         // Child count validation
         if (!empty($_POST['childCount']) && (!is_numeric($_POST['childCount']) || intval($_POST['childCount']) < 1)) {
-            $errors[] = __("Child count must be a positive integer.", TEXT_DOMAIN);
+            $errors[] = __("Child count must be a positive integer.", "GFA_HUB");
         }
 
         // Infant count validation
         if (!empty($_POST['infantCount']) && !empty($_POST['adultCount']) &&  intval($_POST['infantCount']) > intval($_POST['adultCount'])) {
-            $errors[] = __("Infant count must be a smaller than adult count.", TEXT_DOMAIN);
+            $errors[] = __("Infant count must be a smaller than adult count.", "GFA_HUB");
         }
 
         // Infant count validation
         if (!empty($_POST['infantCount']) && (!is_numeric($_POST['infantCount']) || intval($_POST['infantCount']) < 1)) {
-            $errors[] = __("Infant count must be a positive integer.", TEXT_DOMAIN);
+            $errors[] = __("Infant count must be a positive integer.", "GFA_HUB");
         }
 
         return $errors;
@@ -406,7 +406,7 @@ class Flight_Ajax_Handler
         $order = wc_get_order($order_id);
 
         if (!$order) {
-            throw new Exception(__("Order not found.", TEXT_DOMAIN));
+            throw new Exception(__("Order not found.", "GFA_HUB"));
         }
 
         // Check if the user is logged in
@@ -415,18 +415,18 @@ class Flight_Ajax_Handler
 
             // Ensure the order belongs to the logged-in user
             if ($order->get_user_id() != $user_id) {
-                throw new Exception(__("This order does not belong to you.", TEXT_DOMAIN));
+                throw new Exception(__("This order does not belong to you.", "GFA_HUB"));
             }
         } else {
             // Check for guest token if user is not logged in
             if (empty($guest_token)) {
-                throw new Exception(__("This order does not belong to you.", TEXT_DOMAIN));
+                throw new Exception(__("This order does not belong to you.", "GFA_HUB"));
             }
 
             // Validate guest token against the order meta
             $stored_guest_token = get_post_meta($order->get_id(), 'order_guest_token', true);
             if ($stored_guest_token !== $guest_token) {
-                throw new Exception(__("This order does not belong to you.", TEXT_DOMAIN));
+                throw new Exception(__("This order does not belong to you.", "GFA_HUB"));
             }
         }
     }

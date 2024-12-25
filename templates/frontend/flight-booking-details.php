@@ -7,18 +7,18 @@
         <div class="col-md-12 p-0 m-0">
             <div class="table-responsive">
                 <table class="table table-collapse">
-                    <caption><?php _e("Itineray Details", TEXT_DOMAIN) ?></caption>
+                    <caption><?php _e("Itineray Details", "GFA_HUB") ?></caption>
                     <thead>
                         <tr>
-                            <th><?php _e("AirLine / FlightNo", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Departure AirPort / Terminal", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Departure Date & Time", TEXT_DOMAIN) ?></th>i
-                            <th><?php _e("Arrival AirPort / Terminal", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Arrival Date & Time", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Duration", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Cabin Class", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Equipment Type", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("PNR", TEXT_DOMAIN) ?></th>
+                            <th><?php _e("AirLine / FlightNo", "GFA_HUB") ?></th>
+                            <th><?php _e("Departure AirPort / Terminal", "GFA_HUB") ?></th>
+                            <th><?php _e("Departure Date & Time", "GFA_HUB") ?></th>i
+                            <th><?php _e("Arrival AirPort / Terminal", "GFA_HUB") ?></th>
+                            <th><?php _e("Arrival Date & Time", "GFA_HUB") ?></th>
+                            <th><?php _e("Duration", "GFA_HUB") ?></th>
+                            <th><?php _e("Cabin Class", "GFA_HUB") ?></th>
+                            <th><?php _e("Equipment Type", "GFA_HUB") ?></th>
+                            <th><?php _e("PNR", "GFA_HUB") ?></th>
                         </tr>
                     </thead>
                     <tbody id="handlebarsFundTable">
@@ -81,15 +81,15 @@
         <div class="col-md-12 p-0 m-0">
             <div class="table-responsive">
                 <table class="table table-collapse">
-                    <caption><?php _e("Passenger Detalis", TEXT_DOMAIN) ?></caption>
+                    <caption><?php _e("Passenger Detalis", "GFA_HUB") ?></caption>
                     <thead>
                         <tr>
-                            <th><?php _e("PaxType / Title / First / Last / Gender", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Date of Birth", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Passport", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Passenger Nationality", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Passport DOE", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Seat", TEXT_DOMAIN) ?></th>
+                            <th><?php _e("PaxType / Title / First / Last / Gender", "GFA_HUB") ?></th>
+                            <th><?php _e("Date of Birth", "GFA_HUB") ?></th>
+                            <th><?php _e("Passport", "GFA_HUB") ?></th>
+                            <th><?php _e("Passenger Nationality", "GFA_HUB") ?></th>
+                            <th><?php _e("Passport DOE", "GFA_HUB") ?></th>
+                            <th><?php _e("Seat", "GFA_HUB") ?></th>
                         </tr>
                     </thead>
                     <tbody id="handlebarsFundTable">
@@ -136,13 +136,13 @@
         <div class="col-md-12 p-0 m-0">
             <div class="table-responsive">
                 <table class="table table-collapse">
-                    <caption><?php _e("Client Fare", TEXT_DOMAIN) ?></caption>
+                    <caption><?php _e("Client Fare", "GFA_HUB") ?></caption>
                     <thead>
                         <tr>
-                            <th><?php _e("PaxType", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Base Fare", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Tax", TEXT_DOMAIN) ?></th>
-                            <th><?php _e("Client Total", TEXT_DOMAIN) ?></th>
+                            <th><?php _e("PaxType", "GFA_HUB") ?></th>
+                            <th><?php _e("Base Fare", "GFA_HUB") ?></th>
+                            <th><?php _e("Tax", "GFA_HUB") ?></th>
+                            <th><?php _e("Client Total", "GFA_HUB") ?></th>
                         </tr>
                     </thead>
                     <tbody id="handlebarsFundTable">
@@ -199,7 +199,7 @@
 <!-- baggaes -->
 <div class="container">
     <div>
-        <h2><?php _e("Baggage", TEXT_DOMAIN) ?></h2>
+        <h2><?php _e("Baggage", "GFA_HUB") ?></h2>
         <?php foreach ($baggages as $bag) { ?>
             <div class="row">
                 <div class="col-md-12 p-0 m-0">
@@ -213,9 +213,9 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th><b><?php _e("Baggage", TEXT_DOMAIN) ?></b></th>
-                                    <th><b><?php _e("Check In", TEXT_DOMAIN) ?></b></th>
-                                    <th><b><?php _e("Cabin", TEXT_DOMAIN) ?></b></th>
+                                    <th><b><?php _e("Baggage", "GFA_HUB") ?></b></th>
+                                    <th><b><?php _e("Check In", "GFA_HUB") ?></b></th>
+                                    <th><b><?php _e("Cabin", "GFA_HUB") ?></b></th>
                                 </tr>
                             </thead>
                             <tbody id="handlebarsFundTable">
@@ -251,20 +251,20 @@
         <div class="woocommerce-notices-wrapper"></div>
         <div id="gfa-hub-loader" class="loader" style="display: none;"></div>
         <div class="cancel-flight">
-            <button class="btn btn-outline-danger" id="cancel-flight"><?php _e("Cancel", TEXT_DOMAIN) ?></button>
+            <button class="btn btn-outline-danger" id="cancel-flight"><?php _e("Cancel", "GFA_HUB") ?></button>
             <?php if ($ticket_time_limit) { ?> <!-- Example: 2024-11-26T15:30:00 -->
                 <?php $date = new DateTime($ticket_time_limit); ?>
                 <?php if ($date > new DateTime()) { ?>
                     <p>
-                        <?php _e("Flight will be cancelled automatically after ", TEXT_DOMAIN); ?>
+                        <?php _e("Flight will be cancelled automatically after ", "GFA_HUB"); ?>
                     <div id="countdown-timer" data-ticket-limit="<?php echo esc_attr($ticket_time_limit); ?>"></div>
                     </p>
                 <?php } ?>
             <?php } ?>
         </div>
         <div class="confirm-flight">
-            <button class="btn btn-outline-primary" id="confirm-flight"><?php _e('Confirm', TEXT_DOMAIN) ?></button>
-            <span><?php _e("Please if you confirm the flight, you will not be able to cancel it.", TEXT_DOMAIN) ?></span>
+            <button class="btn btn-outline-primary" id="confirm-flight"><?php _e('Confirm', "GFA_HUB") ?></button>
+            <span><?php _e("Please if you confirm the flight, you will not be able to cancel it.", "GFA_HUB") ?></span>
         </div>
     </div>
     <input id="flight-order-id" hidden value="<?php echo $booking_id ?>" />

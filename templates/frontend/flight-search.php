@@ -8,21 +8,21 @@ $airport_codes = get_airport_codes_from_csv();
     <div class="search-box d-flex h-100 flex-column gap-2 container-fluid">
         <div class="trip-type gap-4 d-flex justify-content-start">
             <label>
-                <input type="radio" name="airTravelType" value="OneWay" checked> <?php _e("One Way", TEXT_DOMAIN) ?>
+                <input type="radio" name="airTravelType" value="OneWay" checked> <?php _e("One Way", "GFA_HUB") ?>
             </label>
             <label>
-                <input type="radio" name="airTravelType" value="RoundTrip"> <?php _e("Round Trip", TEXT_DOMAIN) ?>
+                <input type="radio" name="airTravelType" value="RoundTrip"> <?php _e("Round Trip", "GFA_HUB") ?>
             </label>
         </div>
         <div class="p-4 rounded-2 SearchDataWrapper gap-2 gap-md-0 rounded shadow-sm">
             <div class="row  gap-2 ">
                 <div class="col-xl-3 col-12 p-0 m-0 d-flex  flex-fill gap-1 input-row flex-lg-row flex-column">
                     <div class="input-group col flex-fill w-100">
-                        <span class="input-group-text"><?php _e("Departure", TEXT_DOMAIN) ?></span>
+                        <span class="input-group-text"><?php _e("Departure", "GFA_HUB") ?></span>
                         <input type="date" name="departureDateTime" id="dateOne" class="form-control  border-0">
                     </div>
                     <div class="input-group col flex-fill returnDate w-100" style="display: none;">
-                        <span class="input-group-text"><?php _e("Return", TEXT_DOMAIN) ?></span>
+                        <span class="input-group-text"><?php _e("Return", "GFA_HUB") ?></span>
                         <input type="date" name="returnDateTime" class="form-control border-0">
                     </div>
                 </div>
@@ -38,7 +38,7 @@ $airport_codes = get_airport_codes_from_csv();
             </div>
         </div>
         <div class="search-btn d-flex justify-content-end">
-            <button class="btn btn-primary p-2  search-flights"><?php _e("Search Flights", TEXT_DOMAIN) ?></button>
+            <button class="btn btn-primary p-2  search-flights"><?php _e("Search Flights", "GFA_HUB") ?></button>
         </div>
 
         <div class="woocommerce-notices-wrapper"></div>
@@ -97,11 +97,11 @@ $airport_codes = get_airport_codes_from_csv();
                 <div class="col-10 input-row p-0">
                     <div class="input-group gap-1">
                         <select class="form-select border rounded" name="cabinClass">
-                            <option value="Economy"><?php _e("Economy", TEXT_DOMAIN) ?></option>
-                            <option value="PremiumEconomy"><?php _e("Premium Economy", TEXT_DOMAIN) ?></option>
-                            <option value="Business"><?php _e("Business", TEXT_DOMAIN) ?></option>
-                            <option value="First"><?php _e("First", TEXT_DOMAIN) ?></option>
-                            <option value="PremiumFirst"><?php _e("Premium First", TEXT_DOMAIN) ?></option>
+                            <option value="Economy"><?php _e("Economy", "GFA_HUB") ?></option>
+                            <option value="PremiumEconomy"><?php _e("Premium Economy", "GFA_HUB") ?></option>
+                            <option value="Business"><?php _e("Business", "GFA_HUB") ?></option>
+                            <option value="First"><?php _e("First", "GFA_HUB") ?></option>
+                            <option value="PremiumFirst"><?php _e("Premium First", "GFA_HUB") ?></option>
                         </select>
                     </div>
                 </div>

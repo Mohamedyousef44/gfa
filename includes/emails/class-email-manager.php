@@ -50,7 +50,7 @@ if (!class_exists('Omdr_Email_Handler')) {
 
         public function get_heading()
         {
-            return __('Confirm Your Flight', TEXT_DOMAIN);
+            return __('Confirm Your Flight', "GFA_HUB");
         }
     }
     Omdr_Email_Manager::get_instance();

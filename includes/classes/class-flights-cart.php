@@ -44,7 +44,7 @@ if (!class_exists('Flights_Cart')) {
         {
             // // Check if the cart already contains any items
             if (WC()->cart->get_cart_contents_count() > 0) {
-                wp_send_json_error(['message' => __('Your cart already contains items. Please complete or clear your cart before adding a flight.', TEXT_DOMAIN)]);
+                wp_send_json_error(['message' => __('Your cart already contains items. Please complete or clear your cart before adding a flight.', "GFA_HUB")]);
                 return;
             }
 
@@ -77,7 +77,7 @@ if (!class_exists('Flights_Cart')) {
                     ]
                 );
             } else {
-                wp_send_json_error(['message' => __('Could not add flight to cart', TEXT_DOMAIN)]);
+                wp_send_json_error(['message' => __('Could not add flight to cart', "GFA_HUB")]);
             }
         }
 
@@ -97,7 +97,7 @@ if (!class_exists('Flights_Cart')) {
             // If the cart contains a flight item, prevent adding any other product
             if ($cart_contains_flight) {
                 // You can add a custom message or error here to inform the user
-                wc_add_notice(__('You cannot add any other product to the cart while a flight is already in the cart.', TEXT_DOMAIN), 'error');
+                wc_add_notice(__('You cannot add any other product to the cart while a flight is already in the cart.', "GFA_HUB"), 'error');
                 return false;
             }
 

@@ -44,7 +44,7 @@ class WPEX_Options_Panel
     {
         $this->args              = $args;
         $this->settings          = $settings;
-        $this->title             = $this->args['title'] ?? esc_html__('Options', 'text_domain');
+        $this->title             = $this->args['title'] ?? esc_html__('Options', 'GFA_HUB');
         $this->slug              = $this->args['slug'] ?? sanitize_key($this->title);
         $this->option_name       = $this->args['option_name'] ?? sanitize_key($this->title);
         $this->option_group_name = $this->option_name . '_group';
@@ -194,7 +194,7 @@ class WPEX_Options_Panel
             add_settings_error(
                 $this->option_name . '_mesages',
                 $this->option_name . '_message',
-                esc_html__('Settings Saved', 'text_domain'),
+                esc_html__('Settings Saved', 'GFA_HUB'),
                 'updated'
             );
         }

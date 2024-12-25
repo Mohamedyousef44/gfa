@@ -43,13 +43,13 @@ if (!class_exists('Flight_Booking_Details_Shortcode')) {
             $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
 
             if (!$order_id) {
-                return __('Not Found', TEXT_DOMAIN);
+                return __('Not Found', "GFA_HUB");
             }
 
             $order = wc_get_order($order_id);
 
             if (!$order) {
-                return __('Not Found.', TEXT_DOMAIN);
+                return __('Not Found.', "GFA_HUB");
             }
 
             // Check ownership for logged-in users
@@ -62,7 +62,7 @@ if (!class_exists('Flight_Booking_Details_Shortcode')) {
                 // Valid token matches for the guest order
                 $can_view = true;
             } else {
-                return __('You are not authorized to view this page.', TEXT_DOMAIN);
+                return __('You are not authorized to view this page.', "GFA_HUB");
             }
 
             if ($can_view) {
@@ -94,13 +94,13 @@ if (!class_exists('Flight_Booking_Details_Shortcode')) {
                                 update_post_meta($order_id, 'ticket_time_limit', $ticket_time_limit);
                             }
                         } else {
-                            return __('Not Found', TEXT_DOMAIN);
+                            return __('Not Found', "GFA_HUB");
                         }
                     } else {
-                        return __('Fot Found', TEXT_DOMAIN);
+                        return __('Fot Found', "GFA_HUB");
                     }
                 } catch (Exception $e) {
-                    return __("Not Found", TEXT_DOMAIN);
+                    return __("Not Found", "GFA_HUB");
                 }
 
                 ob_start();

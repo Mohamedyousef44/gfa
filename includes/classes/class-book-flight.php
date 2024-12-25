@@ -89,7 +89,7 @@ if (!class_exists('Book_Flight')) {
                 $infNum = $flight_details['infNum'] ?? 0;
 
                 echo '<div class="passengers-container">';
-                echo '<h3>' . __("Complete Passengers Information", TEXT_DOMAIN) . '</h3>';
+                echo '<h3>' . __("Complete Passengers Information", "GFA_HUB") . '</h3>';
                 // Render adult passenger details forms
                 for ($i = 1; $i <= $adtNum; $i++) {
                     $type = 'adt';
@@ -261,9 +261,6 @@ if (!class_exists('Book_Flight')) {
             if ($is_booked  == "1" && $flight_order_id) {
                 $is_hold = isset($flight_details['isHold']) && $flight_details['isHold'] == "true";
                 $hold_action = isset($flight_details['holdAction']) && $flight_details['holdAction'] == "true";
-                // error_log($flight_details['holdAction']);
-                // error_log(json_encode($is_hold));
-                // error_log(json_encode($hold_action));
                 $this->maybe_confirm_flight($is_hold, $hold_action, $flight_order_id);
             }
         }
@@ -289,7 +286,7 @@ if (!class_exists('Book_Flight')) {
         {
             $is_flight_order = get_post_meta($order_id, "is_flight_order", true);
             if ($is_flight_order) {
-                echo "<p class='flight-notice'>" . __("Please check your email to confirm your flight.", TEXT_DOMAIN) . "</p>";
+                echo "<p class='flight-notice'>" . __("Please check your email to confirm your flight.", "GFA_HUB") . "</p>";
                 remove_action('woocommerce_thankyou', 'woocommerce_order_details_table', 10);
             }
         }
@@ -347,10 +344,10 @@ if (!class_exists('Book_Flight')) {
                     $data["traceId"] = $response["data"]["traceId"];
                 } else {
                     // Other errors - Raise an exception with a user-friendly message
-                    $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', TEXT_DOMAIN));
+                    $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', "GFA_HUB"));
                 }
             } catch (Exception $e) {
-                $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', TEXT_DOMAIN));
+                $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', "GFA_HUB"));
             }
         }
 
@@ -382,7 +379,7 @@ if (!class_exists('Book_Flight')) {
                         $emails = Omdr_Email_Manager::get_instance();
                         $emails->send(
                             $order->get_billing_email(),
-                            __('Booking Confirmation', TEXT_DOMAIN),
+                            __('Booking Confirmation', "GFA_HUB"),
                             'customer-booked-flight',
                             $data
                         );
@@ -423,63 +420,63 @@ if (!class_exists('Book_Flight')) {
             for ($i = 1; $i <= $num; $i++) {
 
                 if (empty($_POST["passenger_title_{$type}_{$i}"])) {
-                    $errors->add("passenger_title_{$type}_{$i}", __('Title is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_title_{$type}_{$i}", __('Title is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_first_name_{$type}_{$i}"])) {
-                    $errors->add("passenger_first_name_{$type}_{$i}", __('First Name is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_first_name_{$type}_{$i}", __('First Name is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_last_name_{$type}_{$i}"])) {
-                    $errors->add("passenger_last_name_{$type}_{$i}", __('Last Name is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_last_name_{$type}_{$i}", __('Last Name is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_email_{$type}_{$i}"]) || !filter_var($_POST["passenger_email_{$type}_{$i}"], FILTER_VALIDATE_EMAIL)) {
-                    $errors->add("passenger_email_{$type}_{$i}", __('A valid Email is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_email_{$type}_{$i}", __('A valid Email is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_gender_{$type}_{$i}"])) {
-                    $errors->add("passenger_gender_{$type}_{$i}", __('Gender is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_gender_{$type}_{$i}", __('Gender is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_dob_{$type}_{$i}"])) {
                     error_log($_POST["passenger_dob_{$type}_{$i}"]);
-                    $errors->add("passenger_dob_{$type}_{$i}", __('Birth Date is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_dob_{$type}_{$i}", __('Birth Date is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_pax_{$type}_{$i}"])) {
-                    $errors->add("passenger_pax_{$type}_{$i}", __('Pax type is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_pax_{$type}_{$i}", __('Pax type is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_area_code_{$type}_{$i}"])) {
-                    $errors->add("passenger_area_code_{$type}_{$i}", __('Area Code type is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_area_code_{$type}_{$i}", __('Area Code type is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_mobile_{$type}_{$i}"])) {
-                    $errors->add("passenger_mobile_{$type}_{$i}", __('Mobile is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_mobile_{$type}_{$i}", __('Mobile is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_nationality_{$type}_{$i}"])) {
-                    $errors->add("passenger_nationality_{$type}_{$i}", __('Nationality is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_nationality_{$type}_{$i}", __('Nationality is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_number_{$type}_{$i}"])) {
-                    $errors->add("passenger_passport_number_{$type}_{$i}", __('Passport Number is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_passport_number_{$type}_{$i}", __('Passport Number is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_doi_{$type}_{$i}"])) {
                     error_log($_POST["passenger_passport_doi_{$type}_{$i}"]);
-                    $errors->add("passenger_passport_doi_{$type}_{$i}", __('Passport Issue Date is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_passport_doi_{$type}_{$i}", __('Passport Issue Date is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_doe_{$type}_{$i}"])) {
                     error_log($_POST["passenger_passport_doe_{$type}_{$i}"]);
-                    $errors->add("passenger_passport_doe_{$type}_{$i}", __('Passport Expiry Date is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_passport_doe_{$type}_{$i}", __('Passport Expiry Date is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_ic_{$type}_{$i}"])) {
                     error_log($_POST["passenger_passport_ic_{$type}_{$i}"]);
-                    $errors->add("passenger_passport_ic_{$type}_{$i}", __('Passport Issue Country is required for all passengers.', TEXT_DOMAIN));
+                    $errors->add("passenger_passport_ic_{$type}_{$i}", __('Passport Issue Country is required for all passengers.', "GFA_HUB"));
                 }
             }
         }
@@ -498,7 +495,7 @@ if (!class_exists('Book_Flight')) {
             // Check for duplicates
             $unique_numbers = array_unique($passport_numbers);
             if (count($unique_numbers) < count($passport_numbers)) {
-                $errors->add("passport_number_duplication", __('Duplicate passport numbers found.', TEXT_DOMAIN));
+                $errors->add("passport_number_duplication", __('Duplicate passport numbers found.', "GFA_HUB"));
             }
         }
 
@@ -569,7 +566,6 @@ if (!class_exists('Book_Flight')) {
         private function maybe_confirm_flight($is_hold, $hold_action, $flight_order_id)
         {
             if ($is_hold && !$hold_action) {
-                error_log("confirm the flight.........");
                 $data = array(
                     "OrderRefId" => $flight_order_id
                 );
