@@ -3,6 +3,8 @@ var flightDataStore = {}
 var selectedPurchaseId;
 let finalePrice = null;
 let fareClass = null;
+var extraBags = {}
+var weightID;
 jQuery(document).ready(function ($) {
 
     $('.selectInput').select2({
@@ -136,6 +138,9 @@ jQuery(document).ready(function ($) {
         let purchaseId = selectedPurchaseId;
         let flightDetails = flightDataStore[purchaseId];
         flightDetails.holdAction = false
+        // Check if the extraBags object contains the purchaseID
+        let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
+        flightDetails.extraBag = selectedExtraBag
 
         $.ajax(
             {
@@ -164,6 +169,9 @@ jQuery(document).ready(function ($) {
         let purchaseId = selectedPurchaseId;
         let flightDetails = flightDataStore[purchaseId];
         flightDetails.holdAction = true
+        // Check if the extraBags object contains the purchaseID
+        let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
+        flightDetails.extraBag = selectedExtraBag
 
         $.ajax(
             {
@@ -184,6 +192,89 @@ jQuery(document).ready(function ($) {
                     }
                 }
             });
+    });
+
+    // open modal of the extra bags
+    $(document).on('click', '.add-more-bags', function (e) {
+
+        let purchaseID = selectedPurchaseId;
+        let traceID = localStorage.getItem("flightSearchTraceId");
+
+        // Check if both purchaseID and traceID have data
+        if (purchaseID && traceID) {
+            $.ajax(
+                {
+                    url: wc_add_to_cart_params.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'omdr_revalidate_flights',
+                        trace_id: traceID,
+                        purchase_id: purchaseID,
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Open the modal
+                            $('#BaggageModal').modal('show');
+
+                            // Select the container for extra bags
+                            let $container = $('.extra-bags');
+                            $container.empty(); // Clear old content to prevent duplication
+
+                            let data = response.data;
+                            let hasBaggage = false;
+
+                            if (data.length) {
+                                data.forEach((service) => {
+                                    if (service.additionalServiceType === "Baggage") {
+                                        hasBaggage = true; // Flag that baggage services exist
+
+                                        // Extract service details
+                                        let cityPair = service.cityPair;
+                                        let weight = service.serviceDescription;
+                                        let weightID = service.freeText;
+                                        let amount = service.flightFares[0].amount;
+
+                                        // Ensure all required details are present before rendering
+                                        if (weight && weightID && amount) {
+                                            if (!extraBags[purchaseID]) {
+                                                extraBags[purchaseID] = [];
+                                            }
+
+                                            // Add the bag details to the purchaseID's extraBags array
+                                            extraBags[purchaseID].push({
+                                                weightID,
+                                                amount
+                                            });
+
+                                            let element = `
+                                                    <div class="bag-item">
+                                                        <p class="city-pair">City Pair: ${cityPair}</p>
+                                                        <p class="weight-description">Weight: ${weight}</p>
+                                                        <p class="weight-price">Amount: ${amount} SAR</p>
+                                                        <input name="weight-id" type="radio" data-amount=${amount} value="${weightID}">
+                                                    </div>`;
+                                            $container.append(element);
+                                        }
+                                    }
+                                });
+                            }
+
+                            // If no baggage services were found
+                            if (!hasBaggage) {
+                                $container.append(`<p>No Extra bags for this flight</p>`);
+                            }
+                        } else {
+                            // Handle error case
+                            renderWooNotice([response.message], 'error');
+                        }
+                    }
+
+                });
+        }
+    });
+
+    $(document).on('input', "input[name='weight-id']", function (e) {
+        weightID = $(this).val();
     });
 
 });
@@ -538,67 +629,12 @@ function renderOffcanvas(flightDetails) {
         $('#hold-flight').hide()
     }
 
+    // add more bags button
     if (flightDetails.isPaidBags) {
         $('.add-more-bags').show()
     } else {
         $('.add-more-bags').hide()
     }
-
-    $(document).on('click', '.add-more-bags', function (e) {
-
-        let purchaseID = selectedPurchaseId;
-        let traceID = localStorage.getItem("flightSearchTraceId");
-
-        // Check if both purchaseID and traceID have data
-        if (purchaseID && traceID) {
-
-            $.ajax(
-                {
-                    url: wc_add_to_cart_params.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'omdr_revalidate_flights',
-                        trace_id: traceID,
-                        purchase_id: purchaseID,
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            // Open the modal
-                            $('#BaggageModal').modal('show');
-                            let data = response.data
-                            if (data.length) {
-                                let $container = $('.extra-bags')
-                                data.forEach((service) => {
-                                    if (service.additionalServiceType === "Baggage") {
-                                        let cityPair = service.cityPair
-                                        let weight = service.serviceDescription
-                                        let weightID = service.freeText
-                                        let amount = service.flightFares[0].amount
-                                        console.log({ cityPair, weight, weightID, amount })
-                                        if (weight && weightID && amount) {
-                                            let element = `<div class="bag-item">
-                                                <p class="city-pair">City Pair: ${cityPair}</p>
-                                                <p class="weight-description">Weight: ${weight}</p>
-                                                <p class="weight-price">Amount: ${amount} SAR</p>
-                                                <input type="radio" value="${weightID}">
-                                            </div>`
-                                            $container.append(element)
-                                        }
-                                    } else {
-                                        $container.append(`<p>No Extra bags for this flight</p>`)
-                                    }
-                                })
-                            } else {
-                                $container.append(`<p>No Extra bags for this flight</p>`)
-                            }
-                        } else {
-                            renderWooNotice([response.message], 'error')
-                        }
-                    }
-                });
-        }
-    });
-
 
     // Select and clear the container
     const flightInfoContainer = $("#flight-info-container");

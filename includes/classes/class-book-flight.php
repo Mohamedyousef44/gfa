@@ -127,6 +127,14 @@ if (!class_exists('Book_Flight')) {
                         // $pprice = $this->get_flight_total_price($cart_item['flight_details']['fareGroup'], $cart_item['flight_details']['passengersCount']);
                         if ($cart_item['flight_details']['price']) {
                             $price = $cart_item['flight_details']['price'];
+                            $is_paid_bags = $cart_item['flight_details']['isPaidBags'];
+                            if ($is_paid_bags == "true") {
+                                $extra_bag = $cart_item['flight_details']['extraBag'];
+                                if (isset($extra_bag['amount'])) {
+                                    $amount = $extra_bag['amount'];
+                                    $price = floatval($price) + floatval($amount);
+                                }
+                            }
                             $cart_item['data']->set_price($price);
                         }
                     }

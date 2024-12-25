@@ -60,7 +60,7 @@
                                     <p class="city-pair">City Pair: CAIJED</p>
                                     <p class="weight-description">Weight: 10Kg</p>
                                     <p class="weight-price">Amount: 18.52 SAR</p>
-                                    <input type="radio" value="SCI_0KG&1_CAIJED">
+                                    <input name="weight-id" type="radio" value="SCI_0KG&1_CAIJED">
                                 </div>
                                 <div class="bag-item">
                                     <p class="city-pair">City Pair: CAIJED</p>

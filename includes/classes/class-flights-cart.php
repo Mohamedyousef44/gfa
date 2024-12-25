@@ -13,7 +13,7 @@ if (!class_exists('Flights_Cart')) {
         {
             add_action('wp_ajax_flights_ajax_add_to_cart', array($this, 'flights_ajax_add_to_cart'));
             add_action('wp_ajax_nopriv_flights_ajax_add_to_cart', array($this, 'flights_ajax_add_to_cart'));
-            // add_filter('woocommerce_add_to_cart_validation', array($this, 'prevent_adding_if_flight_in_cart'), 10, 3);
+            add_filter('woocommerce_add_to_cart_validation', array($this, 'prevent_adding_if_flight_in_cart'), 10, 3);
         }
 
         public function get_or_create_dummy_product()
@@ -43,10 +43,10 @@ if (!class_exists('Flights_Cart')) {
         public function flights_ajax_add_to_cart()
         {
             // // Check if the cart already contains any items
-            // if (WC()->cart->get_cart_contents_count() > 0) {
-            //     wp_send_json_error(['message' => __('Your cart already contains items. Please complete or clear your cart before adding a flight.', TEXT_DOMAIN)]);
-            //     return;
-            // }
+            if (WC()->cart->get_cart_contents_count() > 0) {
+                wp_send_json_error(['message' => __('Your cart already contains items. Please complete or clear your cart before adding a flight.', TEXT_DOMAIN)]);
+                return;
+            }
 
             // Validate inputs.
             $trace_id = isset($_POST['trace_id']) ? sanitize_text_field($_POST['trace_id']) : '';
