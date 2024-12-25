@@ -19,6 +19,9 @@ class Flight_Ajax_Handler
 
         add_action('wp_ajax_nopriv_omdr_get_fares', [$this, 'get_fares']);
         add_action('wp_ajax_omdr_get_fares', [$this, 'get_fares']);
+
+        add_action('wp_ajax_nopriv_omdr_revalidate_flights', [$this, 'revalidate_flights']);
+        add_action('wp_ajax_omdr_revalidate_flights', [$this, 'revalidate_flights']);
     }
 
     // 1. AJAX function to search flights
@@ -258,6 +261,48 @@ class Flight_Ajax_Handler
                 $response_data["data"] = $response["data"]["segGroups"] ?? [];
             } else {
                 throw new Exception(__("There is no data for this flight", TEXT_DOMAIN));
+            }
+        } catch (Exception $e) {
+            // Handle exceptions and return a JSON error response
+            $response_data = array(
+                "success" => false,
+                "message" => $e->getMessage()
+            );
+        }
+
+        // Send JSON response
+        wp_send_json($response_data);
+    }
+
+    public function revalidate_flights()
+    {
+
+        $response_data = array(
+            "success" => true,
+        );
+
+        try {
+            $trace_id = isset($_POST['trace_id']) ? ($_POST['trace_id']) : "";
+            $purchase_id = isset($_POST['purchase_id']) ? ($_POST['purchase_id']) : "";
+
+            if (empty($trace_id) || empty($purchase_id)) {
+                throw new Exception(__("there is some data missing", TEXT_DOMAIN));
+            }
+
+            // Prepare data to send to the API
+            $data = array(
+                "traceId" => $trace_id,
+                "purchaseIds" => [$purchase_id]
+            );
+
+            // Call the API to cancel the ticket
+            $response = $this->flights->flight_revalidation($data);
+            error_log(json_encode($response));
+            // Check the API response code
+            if ($response['code'] == 200) {
+                $response_data["data"] = $response["data"]["additionalServices"] ?? [];
+            } else {
+                throw new Exception(__("There is issue happened please try again later", TEXT_DOMAIN));
             }
         } catch (Exception $e) {
             // Handle exceptions and return a JSON error response
