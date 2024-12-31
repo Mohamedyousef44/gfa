@@ -377,12 +377,16 @@ if (!class_exists('Book_Flight')) {
                             update_post_meta($order_id, "order_guest_token", $guest_token);
                         }
                         // send email with the flight details and link to access it.
+                        $flight_details = get_post_meta($order_id, 'flight_details', true);
+
                         $order = wc_get_order($order_id);
                         $data = [
-                            'order' => $order
+                            'order' => $order,
+                            'isHold' => isset($flight_details["holdAction"]) && $flight_details["holdAction"] == "1"
                         ];
                         $emails = Omdr_Email_Manager::get_instance();
-                        $subject = __('Booking Confirmation', "GFA_HUB");
+                        error_log($flight_details["holdAction"]);
+                        $subject = $data["isHold"] ? __('Booking Confirmation', "GFA_HUB") : __('Flight Booked', "GFA_HUB");
                         $emails->send(
                             $order->get_billing_email(),
                             $subject,
