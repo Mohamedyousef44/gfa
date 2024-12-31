@@ -209,7 +209,7 @@ jQuery(document).ready(function ($) {
                         // Loop through passenger types (ADT, CHD, INF)
                         Object.keys(passengerCount).forEach((type) => {
                             let count = passengerCount[type];
-
+                            type = type.toLowerCase()
                             for (let i = 1; i <= count; i++) {
                                 // Render a header for each passenger
                                 $container.append(`<h3>${type} ${i} Baggage Options</h3>`);

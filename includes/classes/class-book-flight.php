@@ -205,11 +205,12 @@ if (!class_exists('Book_Flight')) {
                     $adtNum = $flight_details['adtNum'] ?? 0;
                     $chdNum = $flight_details['chdNum'] ?? 0;
                     $infNum = $flight_details['infNum'] ?? 0;
+                    $extra_bags = $flight_details['selectedBags'] ?? [];
 
                     // Populate passenger data
-                    $this->add_passenger_data($flight_details["passengers"], 'adt', $adtNum);
-                    $this->add_passenger_data($flight_details["passengers"], 'chd', $chdNum);
-                    $this->add_passenger_data($flight_details["passengers"], 'inf', $infNum);
+                    $this->add_passenger_data($flight_details["passengers"], 'adt', $adtNum, $extra_bags);
+                    $this->add_passenger_data($flight_details["passengers"], 'chd', $chdNum, $extra_bags);
+                    $this->add_passenger_data($flight_details["passengers"], 'inf', $infNum, $extra_bags);
 
                     // Save the flight details to the order's meta data
                     update_post_meta($order_id, 'is_flight_order', true);
@@ -500,9 +501,11 @@ if (!class_exists('Book_Flight')) {
         }
 
         // Helper function to add passenger data
-        private function add_passenger_data(&$passenger_array, $type, $num)
+        private function add_passenger_data(&$passenger_array, $type, $num, $selected_bags)
         {
             for ($i = 1; $i <= $num; $i++) {
+                $extra_bags_id = $type . "_" . $num;
+                error_log($extra_bags_id);
                 $passenger_data = [
                     "title" => $_POST["passenger_title_{$type}_{$i}"] ?? '',
                     "firstName" => $_POST["passenger_first_name_{$type}_{$i}"] ?? '',
@@ -518,14 +521,16 @@ if (!class_exists('Book_Flight')) {
                     "passportDOI" => $_POST["passenger_passport_doi_{$type}_{$i}"] ?? '',
                     "passportDOE" => $_POST["passenger_passport_doe_{$type}_{$i}"] ?? '',
                     "passportIssuedCountry" => $_POST["passenger_passport_ic_{$type}_{$i}"] ?? '',
-                    "serviceReference" => [
-                        "baggageRefNo" => "",
-                        "SegmentInfo" => ""
-                    ]
                 ];
+
+                // add extra bags if exists
+                if (isset($selected_bags[$extra_bags_id])) {
+                    $passenger_data["serviceReference"] = $selected_bags[$extra_bags_id];
+                }
 
                 // Add each passenger's data to the main passengers array
                 $passenger_array[] = $passenger_data;
+                error_log(json_encode($passenger_array));
             }
         }
 
