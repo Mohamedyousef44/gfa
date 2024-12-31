@@ -382,9 +382,10 @@ if (!class_exists('Book_Flight')) {
                             'order' => $order
                         ];
                         $emails = Omdr_Email_Manager::get_instance();
+                        $subject = __('Booking Confirmation', "GFA_HUB");
                         $emails->send(
                             $order->get_billing_email(),
-                            __('Booking Confirmation', "GFA_HUB"),
+                            $subject,
                             'customer-booked-flight',
                             $data
                         );
@@ -447,7 +448,6 @@ if (!class_exists('Book_Flight')) {
                 }
 
                 if (empty($_POST["passenger_dob_{$type}_{$i}"])) {
-                    error_log($_POST["passenger_dob_{$type}_{$i}"]);
                     $errors->add("passenger_dob_{$type}_{$i}", __('Birth Date is required for all passengers.', "GFA_HUB"));
                 }
 
@@ -472,17 +472,14 @@ if (!class_exists('Book_Flight')) {
                 }
 
                 if (empty($_POST["passenger_passport_doi_{$type}_{$i}"])) {
-                    error_log($_POST["passenger_passport_doi_{$type}_{$i}"]);
                     $errors->add("passenger_passport_doi_{$type}_{$i}", __('Passport Issue Date is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_doe_{$type}_{$i}"])) {
-                    error_log($_POST["passenger_passport_doe_{$type}_{$i}"]);
                     $errors->add("passenger_passport_doe_{$type}_{$i}", __('Passport Expiry Date is required for all passengers.', "GFA_HUB"));
                 }
 
                 if (empty($_POST["passenger_passport_ic_{$type}_{$i}"])) {
-                    error_log($_POST["passenger_passport_ic_{$type}_{$i}"]);
                     $errors->add("passenger_passport_ic_{$type}_{$i}", __('Passport Issue Country is required for all passengers.', "GFA_HUB"));
                 }
             }
