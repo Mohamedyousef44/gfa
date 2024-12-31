@@ -4,7 +4,7 @@ var selectedPurchaseId;
 let finalePrice = null;
 let fareClass = null;
 var extraBags = {}
-var weightID;
+var selectedBaggage = {};
 
 jQuery(document).ready(function ($) {
 
@@ -139,9 +139,14 @@ jQuery(document).ready(function ($) {
         let purchaseId = selectedPurchaseId;
         let flightDetails = flightDataStore[purchaseId];
         flightDetails.holdAction = false
-        // Check if the extraBags object contains the purchaseID
-        let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
-        flightDetails.extraBag = selectedExtraBag
+
+        if (selectedBaggage[purchaseId]) {
+            // Add the selected baggage information to the flight details
+            flightDetails.selectedBags = selectedBaggage[purchaseId];
+        } else {
+            // Default to an empty object if no baggage is selected
+            flightDetails.selectedBags = {};
+        }
 
         addFlightToCart(searchTraceId, purchaseId, flightDetails)
     });
@@ -152,9 +157,14 @@ jQuery(document).ready(function ($) {
         let purchaseId = selectedPurchaseId;
         let flightDetails = flightDataStore[purchaseId];
         flightDetails.holdAction = true
-        // Check if the extraBags object contains the purchaseID
-        let selectedExtraBag = (extraBags[purchaseId]?.find(bag => bag.weightID === weightID)) || {};
-        flightDetails.extraBag = selectedExtraBag
+
+        if (selectedBaggage[purchaseId]) {
+            // Add the selected baggage information to the flight details
+            flightDetails.selectedBags = selectedBaggage[purchaseId];
+        } else {
+            // Default to an empty object if no baggage is selected
+            flightDetails.selectedBags = {};
+        }
 
         addFlightToCart(searchTraceId, purchaseId, flightDetails)
     });
@@ -164,57 +174,68 @@ jQuery(document).ready(function ($) {
 
         let purchaseID = selectedPurchaseId;
         let traceID = localStorage.getItem("flightSearchTraceId");
+        const flightDetails = flightDataStore[selectedPurchaseId];
+        let passengerCount = flightDetails.passengersCount; // e.g., { ADT: 2, CHD: 2, INF: 0 }
 
         // Check if both purchaseID and traceID have data
         if (purchaseID && traceID) {
-            $.ajax(
-                {
-                    url: wc_add_to_cart_params.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'omdr_revalidate_flights',
-                        trace_id: traceID,
-                        purchase_id: purchaseID,
-                    },
-                    beforeSend: function () {
-                        // Show the loader before the request
-                        $('#gfa-hub-loader').show();
-                    },
-                    complete: function () {
-                        // hide the loader before the request
-                        $('#gfa-hub-loader').hide();
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            // Open the modal
-                            $('#BaggageModal').modal('show');
+            $.ajax({
+                url: wc_add_to_cart_params.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'omdr_revalidate_flights',
+                    trace_id: traceID,
+                    purchase_id: purchaseID,
+                },
+                beforeSend: function () {
+                    // Show the loader before the request
+                    $('#gfa-hub-loader').show();
+                },
+                complete: function () {
+                    // Hide the loader after the request
+                    $('#gfa-hub-loader').hide();
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Open the modal
+                        $('#BaggageModal').modal('show');
 
-                            // Select the container for extra bags
-                            let $container = $('.extra-bags');
-                            $container.empty(); // Clear old content to prevent duplication
+                        // Select the container for extra bags
+                        let $container = $('.extra-bags');
+                        $container.empty(); // Clear old content to prevent duplication
 
-                            let data = response.data;
-                            let hasBaggage = false;
+                        let data = response.data;
 
-                            if (data.length) {
+                        // Loop through passenger types (ADT, CHD, INF)
+                        Object.keys(passengerCount).forEach((type) => {
+                            let count = passengerCount[type];
+
+                            for (let i = 1; i <= count; i++) {
+                                // Render a header for each passenger
+                                $container.append(`<h3>${type} ${i} Baggage Options</h3>`);
+
+                                let hasBaggage = false;
+
+                                // Render baggage options for the current passenger
                                 data.forEach((service) => {
                                     if (service.additionalServiceType === "Baggage") {
-                                        hasBaggage = true; // Flag that baggage services exist
+                                        hasBaggage = true;
 
-                                        // Extract service details
                                         let cityPair = service.cityPair;
                                         let weight = service.serviceDescription;
                                         let weightID = service.freeText;
                                         let amount = service.flightFares[0].amount;
 
-                                        // Ensure all required details are present before rendering
                                         if (weight && weightID && amount) {
                                             if (!extraBags[purchaseID]) {
-                                                extraBags[purchaseID] = [];
+                                                extraBags[purchaseID] = {};
+                                            }
+                                            if (!extraBags[purchaseID][`${type}_${i}`]) {
+                                                extraBags[purchaseID][`${type}_${i}`] = [];
                                             }
 
-                                            // Add the bag details to the purchaseID's extraBags array
-                                            extraBags[purchaseID].push({
+                                            // Add baggage details for the specific passenger
+                                            extraBags[purchaseID][`${type}_${i}`].push({
                                                 weightID,
                                                 amount
                                             });
@@ -224,50 +245,58 @@ jQuery(document).ready(function ($) {
                                                     <p class="city-pair">City Pair: ${cityPair}</p>
                                                     <p class="weight-description">Weight: ${weight}</p>
                                                     <p class="weight-price">Amount: ${amount} SAR</p>
-                                                    <input name="weight-id" type="radio" data-amount="${amount}" value="${weightID}">
+                                                    <input class="select-extra-bags" name="weight-id-${type}_${i}" type="radio" data-pairs="${cityPair}" data-amount="${amount}" value="${weightID}">
                                                 </div>`;
                                             $container.append(element);
                                         }
                                     }
                                 });
-                            }
 
-                            // If no baggage services were found
-                            if (hasBaggage) {
-                                $container.append(`
-                                    <div class="bag-item">
-                                        <p class="weight-description">No Extra Baggage</p>
-                                        <input name="weight-id" type="radio" value="none">
-                                    </div>
-                                `);
-                            } else {
-                                $container.append(`<p>No Extra bags for this flight</p>`);
+                                // If no baggage services were found for this passenger
+                                if (hasBaggage) {
+                                    $container.append(`
+                                        <div class="bag-item">
+                                            <p class="weight-description">None</p>
+                                            <input class="select-extra-bags" name="weight-id-${type}_${i}" type="radio" value="none">
+                                        </div>
+                                    `);
+                                } else {
+                                    $container.append(`<p>No Extra bags for this flight</p>`);
+                                }
                             }
-
-                        } else {
-                            // Handle error case
-                            renderWooNotice([response.message], 'error');
-                        }
+                        });
+                    } else {
+                        // Handle error case
+                        renderWooNotice([response.message], 'error');
                     }
-
-                });
+                }
+            });
         }
     });
 
-    $(document).on('input', "input[name='weight-id']", function (e) {
-        $(document).on('input', "input[name='weight-id']", function (e) {
-            // Get the selected value
-            let selectedValue = $(this).val();
+    $(document).on('input', ".select-extra-bags", function (e) {
+        // Get the selected value
+        let weightID = $(this).val();
+        let pairs = $(this).data("pairs");
+        let name = $(this).attr("name").replace("weight-id-", ""); // Remove the prefix
 
-            // Check if "None" is selected
-            if (selectedValue === "none") {
-                weightID = 0;
-            } else {
-                weightID = selectedValue;
-            }
-        });
+        // Ensure the selectedPurchaseID exists in the global variable
+        if (!selectedBaggage[selectedPurchaseId]) {
+            selectedBaggage[selectedPurchaseId] = {};
+        }
+
+        // Update or remove data based on the selection
+        if (weightID !== "none") {
+            // Store the selection data under the simplified name
+            selectedBaggage[selectedPurchaseId][name] = {
+                baggageRefNo: weightID,
+                SegmentInfo: pairs,
+            };
+        } else {
+            // Remove the baggage entry if "None" is selected
+            delete selectedBaggage[selectedPurchaseId][name];
+        }
     });
-
 });
 
 // helper functions
