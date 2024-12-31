@@ -382,10 +382,9 @@ if (!class_exists('Book_Flight')) {
                         $order = wc_get_order($order_id);
                         $data = [
                             'order' => $order,
-                            'isHold' => isset($flight_details["holdAction"]) && $flight_details["holdAction"] == "1"
+                            'isHold' => isset($flight_details["holdAction"]) && $flight_details["holdAction"] == "true"
                         ];
                         $emails = Omdr_Email_Manager::get_instance();
-                        error_log($flight_details["holdAction"]);
                         $subject = $data["isHold"] ? __('Booking Confirmation', "GFA_HUB") : __('Flight Booked', "GFA_HUB");
                         $emails->send(
                             $order->get_billing_email(),
