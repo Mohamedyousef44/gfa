@@ -517,7 +517,11 @@ if (!class_exists('Book_Flight')) {
                     "passportNumber" => $_POST["passenger_passport_number_{$type}_{$i}"] ?? '',
                     "passportDOI" => $_POST["passenger_passport_doi_{$type}_{$i}"] ?? '',
                     "passportDOE" => $_POST["passenger_passport_doe_{$type}_{$i}"] ?? '',
-                    "passportIssuedCountry" => $_POST["passenger_passport_ic_{$type}_{$i}"] ?? ''
+                    "passportIssuedCountry" => $_POST["passenger_passport_ic_{$type}_{$i}"] ?? '',
+                    "serviceReference" => [
+                        "baggageRefNo" => "",
+                        "SegmentInfo" => ""
+                    ]
                 ];
 
                 // Add each passenger's data to the main passengers array
