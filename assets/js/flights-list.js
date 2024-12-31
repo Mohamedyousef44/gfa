@@ -279,6 +279,7 @@ jQuery(document).ready(function ($) {
         let weightID = $(this).val();
         let pairs = $(this).data("pairs");
         let name = $(this).attr("name").replace("weight-id-", ""); // Remove the prefix
+        let amount = $(this).data("amount");
 
         // Ensure the selectedPurchaseID exists in the global variable
         if (!selectedBaggage[selectedPurchaseId]) {
@@ -291,6 +292,7 @@ jQuery(document).ready(function ($) {
             selectedBaggage[selectedPurchaseId][name] = {
                 baggageRefNo: weightID,
                 SegmentInfo: pairs,
+                amount
             };
         } else {
             // Remove the baggage entry if "None" is selected

@@ -129,10 +129,14 @@ if (!class_exists('Book_Flight')) {
                             $price = $cart_item['flight_details']['price'];
                             $is_paid_bags = $cart_item['flight_details']['isPaidBags'];
                             if ($is_paid_bags == "true") {
-                                $extra_bag = $cart_item['flight_details']['extraBag'];
-                                if (isset($extra_bag['amount'])) {
-                                    $amount = $extra_bag['amount'];
-                                    $price = floatval($price) + floatval($amount);
+                                $extra_bag = $cart_item['flight_details']['selectedBags'];
+
+                                if (!empty($extra_bag)) {
+                                    $bags_total = 0;
+                                    foreach ($extra_bag as $bag) {
+                                        $bags_total += $bag["amount"];
+                                    }
+                                    $price = floatval($price) + floatval($bags_total);
                                 }
                             }
                             $cart_item['data']->set_price($price);
@@ -330,7 +334,6 @@ if (!class_exists('Book_Flight')) {
             if ($is_flight_order) {
                 $guest_token = get_post_meta($order->get_id(), 'order_guest_token', true);
                 $url = esc_url(home_url('booking-details') . '/?order_id=' . $order->get_id() . (!empty($guest_token) ? '&token=' . $guest_token : ''));
-                error_log($url);
             }
             return $url;
         }
@@ -359,9 +362,10 @@ if (!class_exists('Book_Flight')) {
                 $response = $api->book_flight($data);
 
                 if ($response["code"] != 200) {
+                    error_log(json_encode($response));
                     $this->process_refund($order_id, 'Flight booking failed. Refunding the order.');
                 } else {
-                    // error_log(json_encode($response));
+                    error_log(json_encode($response));
                     // success case
                     if (isset($response["data"]["orderId"])) {
                         $flight_order_id = $response["data"]["orderId"];
@@ -385,6 +389,8 @@ if (!class_exists('Book_Flight')) {
                             $data
                         );
                     } else {
+                        error_log("orderrefid not returned form the response");
+                        error_log(json_encode($response));
                         $this->process_refund($order_id, 'Flight booking failed. Refunding the order.');
                     }
                 }
@@ -505,7 +511,6 @@ if (!class_exists('Book_Flight')) {
         {
             for ($i = 1; $i <= $num; $i++) {
                 $extra_bags_id = $type . "_" . $num;
-                error_log($extra_bags_id);
                 $passenger_data = [
                     "title" => $_POST["passenger_title_{$type}_{$i}"] ?? '',
                     "firstName" => $_POST["passenger_first_name_{$type}_{$i}"] ?? '',
@@ -525,12 +530,13 @@ if (!class_exists('Book_Flight')) {
 
                 // add extra bags if exists
                 if (isset($selected_bags[$extra_bags_id])) {
-                    $passenger_data["serviceReference"] = $selected_bags[$extra_bags_id];
+                    // unset the amount first
+                    unset($selected_bags[$extra_bags_id]["amount"]);
+                    $passenger_data["serviceReference"][] = $selected_bags[$extra_bags_id];
                 }
 
                 // Add each passenger's data to the main passengers array
                 $passenger_array[] = $passenger_data;
-                error_log(json_encode($passenger_array));
             }
         }
 
