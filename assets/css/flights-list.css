@@ -550,3 +550,14 @@ sup {
 .badge-3 {
     background-color: red;
 }
+p{
+	margin:0!important;
+}
+.bag-item{
+	display:flex;
+	border: 1px solid lightgray;
+	border-radius:15px;
+	align-items:center;
+	justify-content:space-between;
+	padding:10px;
+	margin-bottom:10px;}
