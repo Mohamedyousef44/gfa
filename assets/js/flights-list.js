@@ -241,10 +241,10 @@ jQuery(document).ready(function ($) {
                                             });
 
                                             let element = `
-                                                <div class="bag-item">
-                                                    <p class="city-pair">City Pair: ${cityPair}</p>
-                                                    <p class="weight-description">Weight: ${weight}</p>
-                                                    <p class="weight-price">Amount: ${amount} SAR</p>
+                                                <div class="bag-item  ">
+                                                    <b class="city-pair">City Pair: ${cityPair}</b>
+                                                    <b class="weight-description">Weight: ${weight}</b>
+                                                    <b class="weight-price">Amount: ${amount} SAR</b>
                                                     <input class="select-extra-bags" name="weight-id-${type}_${i}" type="radio" data-pairs="${cityPair}" data-amount="${amount}" value="${weightID}">
                                                 </div>`;
                                             $container.append(element);
@@ -369,7 +369,7 @@ function getRouteInfo(segment) {
 
 function createFlightCards(flights) {
     const container = $('.flight-list');
-
+console.log(flights,'s')
     // Handle empty flight list
     if (flights.length === 0) {
         renderWooNotice(["No flights found. Please try again with different criteria."], 'error', '.search-box')
@@ -382,6 +382,7 @@ function createFlightCards(flights) {
     flights.forEach((flight, indx) => {
         // Extract segment and fare group details
         console.log(flight.vendor)
+		
         let isPaidBags = flight.vendor == "AT";
         const segment = flight.segGroups[0];
         const fareGroup = flight.fareGroups[0];
@@ -395,7 +396,6 @@ function createFlightCards(flights) {
             CHD: flight.chdNum,
             INF: flight.infNum
         };
-
         const totalBase = getFlightTotalPrice(flight, passengersCount);
         // Determine the class based on flight.isHold
         const refundClass = flight.isHold ? 'text-success ' : 'text-danger';
@@ -526,6 +526,8 @@ function createFlightCards(flights) {
 
         flight.fareGroups.forEach((fareGroup, ind) => {
             const totalBase = getFlightTotalPriceSingleFare(fareGroup, passengersCount);
+			    let displayFareRules = (flight.content === 'GDS' && flight.vendor === '1SR') ? 'd-block' : 'd-none';
+
             let layout = 'col-md-6';
             let miniRulesData = fareGroup.miniRules || [];
             let changeValue = 'N/A';
@@ -578,24 +580,72 @@ function createFlightCards(flights) {
             } else if (LastFare >= 3) {
                 layout = 'col-md-2 flex-fill';
             }
+			let miniRulesContent = ""; // Initialize content for miniRules
+
+			miniRulesData.forEach((rule) => {
+    miniRulesContent += `
+        <div class="mini-rule border rounded rounded-5 p-3">
+            <p><strong>Apply:</strong> ${rule.apply}</p>
+            <p><strong>Cancel Amount:</strong> ${rule.canAmt.toFixed(2)} SAR</p>
+            <p><strong>Exchange Amount:</strong> ${rule.exgAmt.toFixed(2)} SAR</p>
+            <p><strong>Remarks:</strong> ${rule.remarks}</p>
+            <p><strong>Cancel Allowed:</strong> ${rule.cancelAllowed ? "Yes" : "No"}</p>
+            <p><strong>Change Allowed:</strong> ${rule.changeAllowed ? "Yes" : "No"}</p>
+        </div>`;
+});
             const fareGroupElement = $(`
-                <div class="fare-group  border col-12 d-flex flex-column justify-content-center gap-2 align-items-center ${layout}   p-3 mb-3">
-                    <h5 class="fare-title text-center fw-bold m-0 p-0 ">${fareGroup.priceClass}</h5>
-					<div class="cardBadge badge-${ind} ${badgeColor}"></div>
-					<div class="cardBadge badge-${ind} cardBadgeTwo ${badgeColor}"></div>
-                    <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">Price: ${totalBase.toFixed(2)} SAR</p>
-                    <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2"> <i class="fa-solid fa-bag-shopping"></i> 					Baggage : ${fareGroup.baggages[0].checkInBag}</p>
-                    <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> 						Cabin baggage:${fareGroup.baggages[0].cabinBag}					</p>
-         			<p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2"><i class="fa-solid fa-money-bill"></i> 						Change Fee :${changeValue}</p>
-        			<p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2"><i class="fa-solid fa-money-bill"></i> 						Refund Fee :${cancelValue}</p>
-                    <div class="d-flex justify-content-center"><a class="btn btn-outline-primary flight-details-link"     
-								        data-bs-dismiss="modal" aria-label="Close"      
-								data-purchase-id=${fareGroup.purchaseId}
-data-book-index-value=${indx}
->Select</a>
-					</div>
-                </div>
-            `);
+    <div class="fare-group border col-12 d-flex flex-column justify-content-center gap-2 align-items-center ${layout} p-3 mb-3">
+        <h5 class="fare-title text-center fw-bold m-0 p-0">
+            ${fareGroup.priceClass}
+          
+        </h5>
+  <button class="btn btn-link text-decoration-none border border-1" data-bs-toggle="modal" data-bs-target="#miniRulesModal">
+                Mini-Rules
+            </button>
+  <button class="btn btn-link text-decoration-none  border border-1 ${displayFareRules}" onclick="showFareRules(${fareGroup.purchaseId})">
+               Fare-Rules
+            </button>
+        <div class="cardBadge badge-${ind} ${badgeColor}"></div>
+        <div class="cardBadge badge-${ind} cardBadgeTwo ${badgeColor}"></div>
+        <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">Price: ${totalBase.toFixed(2)} SAR</p>
+        <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">
+            <i class="fa-solid fa-bag-shopping"></i> Baggage: ${fareGroup.baggages[0].checkInBag}
+        </p>
+        <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">
+            <i class="fa-solid fa-bag-shopping"></i> Cabin baggage: ${fareGroup.baggages[0].cabinBag}
+        </p>
+        <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">
+            <i class="fa-solid fa-money-bill"></i> Change Fee: ${changeValue}
+        </p>
+        <p class="fare-title text-center fw-bold m-0 p-0 d-flex justify-content-between align-items-center gap-2">
+            <i class="fa-solid fa-money-bill"></i> Refund Fee: ${cancelValue}
+        </p>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-outline-primary  border border-1 flight-details-link "     
+               data-bs-dismiss="modal" aria-label="Close"      
+               data-purchase-id=${fareGroup.purchaseId}
+               data-book-index-value=${indx}>
+                Select
+            </a>
+        </div>
+<div class="modal fade" id="miniRulesModal" tabindex="-1" aria-labelledby="miniRulesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="miniRulesModalLabel">Mini-Rules</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column flex-wrap gap-2 p-2">
+ ${miniRulesContent}
+       
+      </div>
+   
+    </div>
+  </div>
+</div>
+    </div>
+`);
+
             classContainer.append(fareGroupElement);
         });
         // Append the card to the container
@@ -625,6 +675,41 @@ function validateDateTimes(departureDateTime, returnDateTime) {
 
     return errors
 }
+   
+// ShowFareRuls 
+function showFareRules(id) {
+    let traceID = localStorage.getItem("flightSearchTraceId");
+    console.log(traceID);
+    console.log(id);
+
+    $.ajax({
+        url: "https://sandboxapi.getfares.com/Flights/Revalidation/v1/FareRule",
+        type: "POST",
+        data: {
+            "trace_id": traceID,
+            "purchase_id": [id.toString()], // Ensure ID is a string
+            "isRevalidation": false
+        },
+        beforeSend: function () {
+            // Show the loader before the request
+            $('#gfa-hub-loader').show();
+        },
+        complete: function () {
+            // Hide the loader after the request
+            $('#gfa-hub-loader').hide();
+        },
+        success: function (response) {
+            if (response.success) {
+                let data = response.data;
+                console.log(data, 'testData');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching fare rules:", error);
+        }
+    }); // <-- This was missing
+} // <-- This was missing
+
 
 function getAPIValidationsErrors(errorObj) {
     let errors = []
@@ -686,7 +771,7 @@ function renderOffcanvas(flightDetails) {
 
             // Reuse the flightCard structure
             const flightCard = `
-                <div class="flight-info my-2 p-3 border shadow-sm rounded-3">
+                <div class="flight-info p-3 border shadow-sm rounded-3">
                     <div class="flight-time d-flex justify-content-between">
                         <div class="flightTimes align-items-center d-flex flex-column">
                             <span class="departure-time">${departureTime}</span>
