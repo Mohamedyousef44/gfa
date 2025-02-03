@@ -369,7 +369,7 @@ function getRouteInfo(segment) {
 
 function createFlightCards(flights) {
     const container = $('.flight-list');
-console.log(flights,'s')
+    console.log(flights, 's')
     // Handle empty flight list
     if (flights.length === 0) {
         renderWooNotice(["No flights found. Please try again with different criteria."], 'error', '.search-box')
@@ -382,7 +382,7 @@ console.log(flights,'s')
     flights.forEach((flight, indx) => {
         // Extract segment and fare group details
         console.log(flight.vendor)
-		
+
         let isPaidBags = flight.vendor == "AT";
         const segment = flight.segGroups[0];
         const fareGroup = flight.fareGroups[0];
@@ -526,7 +526,7 @@ console.log(flights,'s')
 
         flight.fareGroups.forEach((fareGroup, ind) => {
             const totalBase = getFlightTotalPriceSingleFare(fareGroup, passengersCount);
-			    let displayFareRules = (flight.content === 'GDS' && flight.vendor === '1SR') ? 'd-block' : 'd-none';
+            let displayFareRules = (flight.content === 'GDS' && flight.vendor === '1SR') ? 'd-block' : 'd-none';
 
             let layout = 'col-md-6';
             let miniRulesData = fareGroup.miniRules || [];
@@ -580,10 +580,10 @@ console.log(flights,'s')
             } else if (LastFare >= 3) {
                 layout = 'col-md-2 flex-fill';
             }
-			let miniRulesContent = ""; // Initialize content for miniRules
+            let miniRulesContent = ""; // Initialize content for miniRules
 
-			miniRulesData.forEach((rule) => {
-    miniRulesContent += `
+            miniRulesData.forEach((rule) => {
+                miniRulesContent += `
         <div class="mini-rule border rounded rounded-5 p-3">
             <p><strong>Apply:</strong> ${rule.apply}</p>
             <p><strong>Cancel Amount:</strong> ${rule.canAmt.toFixed(2)} SAR</p>
@@ -592,7 +592,7 @@ console.log(flights,'s')
             <p><strong>Cancel Allowed:</strong> ${rule.cancelAllowed ? "Yes" : "No"}</p>
             <p><strong>Change Allowed:</strong> ${rule.changeAllowed ? "Yes" : "No"}</p>
         </div>`;
-});
+            });
             const fareGroupElement = $(`
     <div class="fare-group border col-12 d-flex flex-column justify-content-center gap-2 align-items-center ${layout} p-3 mb-3">
         <h5 class="fare-title text-center fw-bold m-0 p-0">
@@ -675,20 +675,18 @@ function validateDateTimes(departureDateTime, returnDateTime) {
 
     return errors
 }
-   
+
 // ShowFareRuls 
 function showFareRules(id) {
     let traceID = localStorage.getItem("flightSearchTraceId");
-    console.log(traceID);
-    console.log(id);
-
     $.ajax({
-        url: "https://sandboxapi.getfares.com/Flights/Revalidation/v1/FareRule",
+        url: flights_list.ajax_url,
         type: "POST",
         data: {
-            "trace_id": traceID,
-            "purchase_id": [id.toString()], // Ensure ID is a string
-            "isRevalidation": false
+            action: "omdr_get_fares",
+            trace_id: traceID,
+            purchase_id: id.toString(),
+            is_order_created: false
         },
         beforeSend: function () {
             // Show the loader before the request

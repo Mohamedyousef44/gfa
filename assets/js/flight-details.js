@@ -101,7 +101,8 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 data: {
                     action: 'omdr_get_fares',
-                    orderId
+                    orderId,
+                    is_order_created: true
                 },
                 beforeSend: function () {
                     // Show the loader before the request
