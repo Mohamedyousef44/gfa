@@ -238,7 +238,7 @@ class Flight_Ajax_Handler
             $is_order_created = isset($_POST['is_order_created']) ? $_POST['is_order_created'] : false;
 
             // check if the request came from home page before order as ajax
-            if ($is_order_created) {
+            if ($is_order_created == "true") {
                 // Get the order and flight order references from the POST request
                 $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
 
@@ -248,9 +248,11 @@ class Flight_Ajax_Handler
                     throw new Exception(__("There is no data for this flight", "GFA_HUB"));
                 }
 
+                $is_revalidation = true;
                 $trace_id = get_post_meta($order_id, "flight_trace_id", true);
                 $purchase_id = get_post_meta($order_id, "flight_purchase_id", true);
             } else {
+                $is_revalidation = false;
                 $trace_id = isset($_POST['trace_id']) ? ($_POST['trace_id']) : "";
                 $purchase_id = isset($_POST['purchase_id']) ? ($_POST['purchase_id']) : "";
             }
@@ -259,7 +261,7 @@ class Flight_Ajax_Handler
             // Prepare data to send to the API
             $data = array(
                 "traceId" => $trace_id,
-                "isRevalidation" => true,
+                "isRevalidation" => $is_revalidation,
                 "purchaseIds" => [$purchase_id]
             );
 
