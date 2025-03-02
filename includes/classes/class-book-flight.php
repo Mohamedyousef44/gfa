@@ -23,7 +23,7 @@ if (!class_exists('Book_Flight')) {
 
             add_action("woocommerce_checkout_update_order_meta", array($this, "add_flight_data_to_order_meta"), 10, 2);
 
-            add_filter("woocommerce_payment_successful_result", array($this, "maybe_book_flight"), 10, 2);
+            add_action("woocommerce_order_status_pending_to_processing", array($this, "maybe_book_flight"), 10, 1);
 
             add_action('woocommerce_after_pay_action', array($this, 'maybe_confirm_hold_flights'));
 
@@ -36,6 +36,8 @@ if (!class_exists('Book_Flight')) {
             add_action('check_ticket_time_limit_event', array($this, 'check_ticket_time_limit'));
 
             // add_filter('woocommerce_get_checkout_order_received_url', array($this, "redirect_to_flight_details"), 10, 2);
+
+            add_action('woocommerce_order_status_failed', array($this, 'refund_flights_orders_on_failed_status'), 999, 1);
         }
 
         public function register_scripts()
@@ -226,9 +228,10 @@ if (!class_exists('Book_Flight')) {
             }
         }
 
-        public function maybe_book_flight($result, $order_id)
+        public function maybe_book_flight($order_id)
         {
-            if ($result) {
+            try {
+
                 $is_flight_order = get_post_meta($order_id, "is_flight_order", true);
 
                 if ($is_flight_order) {
@@ -237,24 +240,108 @@ if (!class_exists('Book_Flight')) {
                     $trace_id = get_post_meta($order_id, 'flight_trace_id', true);
                     $purchase_id = get_post_meta($order_id, 'flight_purchase_id', true);
                     $flight_details = get_post_meta($order_id, 'flight_details', true);
-                    if (isset($flight_details['passengers'])) {
-                        $passengers = $flight_details['passengers'];
+
+                    if (!isset($flight_details['passengers'])) {
+                        throw new Exception("Flight booking failed. No passengers data found.");
                     }
 
-                    if ($trace_id && $purchase_id && !empty($passengers)) {
-                        // Attempt to book the flight
-                        $data = array(
-                            "traceId" => $trace_id,
-                            "purchaseIds" => [$purchase_id],
-                            "isHold" => true,
-                            "passengers" => $passengers
-                        );
-                        $this->book_flight($data, $order_id);
-                        $this->maybe_confirm_hold_flights($order_id);
+                    $passengers = $flight_details['passengers'];
+
+                    if (empty($trace_id) || empty($purchase_id) || empty($passengers)) {
+                        throw new Exception("Flight booking failed.");
                     }
+
+                    // Attempt to book the flight
+                    $data = array(
+                        "traceId" => $trace_id,
+                        "purchaseIds" => [$purchase_id],
+                        "isHold" => true,
+                        "passengers" => $passengers
+                    );
+
+                    $this->book_flight($data, $order_id);
+                    $this->maybe_confirm_hold_flights($order_id);
+                }
+            } catch (Exception $e) {
+                // Set order status to failed
+                $order = wc_get_order($order_id);
+                if ($order) {
+                    $order->update_status('failed', __('Flight booking failed.', 'woocommerce'));
+                }
+
+                // Redirect to the WooCommerce failed page
+                wc_add_notice(__('Sorry there was a problem processing this flight booking your order will be refunded soon.', 'gfa_hub'), 'error');
+            }
+        }
+
+        public function refund_flights_orders_on_failed_status($order_id)
+        {
+            $order = wc_get_order($order_id);
+
+            if (!$order) return;
+
+            //Check if order is already refunded
+            if ($order->has_status('refunded')) {
+                error_log("Order #{$order_id} is already refunded. Skipping.");
+                return;
+            }
+
+            $is_flight_order = get_post_meta($order_id, "is_flight_order", true);
+
+            if ($is_flight_order) {
+                $this->process_refund($order_id, 'Flight booking failed. Refunding the order.');
+            }
+        }
+
+        private function book_flight($data, $order_id)
+        {
+            $api = Flights_API::get_instance();
+            $response = $api->book_flight($data);
+            if ($response["code"] != 200) {
+                throw new Exception("Flight booking failed. Refunding the order.");
+            } else {
+                // success case
+                if (isset($response["data"]["orderId"])) {
+                    $flight_order_id = $response["data"]["orderId"];
+                    update_post_meta($order_id, "flight_orderId", $flight_order_id);
+                    update_post_meta($order_id, "is_flight_booked", true);
+                    // guest user
+                    if (!is_user_logged_in()) {
+                        $guest_token = wp_generate_uuid4();
+                        update_post_meta($order_id, "order_guest_token", $guest_token);
+                    }
+                    // send email with the flight details and link to access it.
+                    $flight_details = get_post_meta($order_id, 'flight_details', true);
+                    $pnr_codes = [];
+                    $booking_details_response = $api->get_booking($flight_order_id);
+
+                    if ($booking_details_response['code'] == 200 && isset($booking_details_response["data"]["flights"])) {
+                        $pnr_codes['main'] = $booking_details_response["data"]["flights"][0]["pnr"];
+                        $seg_groups = $booking_details_response["data"]["flights"][0]["segGroups"];
+                        foreach ($seg_groups as $group) {
+                            $key = $group["origin"] . "-" . $group["destination"];
+                            $pnr_codes[$key] = $group["segments"][0]["pnr"];
+                        }
+                        update_post_meta($order_id, "flight_pnr", $pnr_codes);
+                    }
+                    $order = wc_get_order($order_id);
+                    $data = [
+                        'order' => $order,
+                        'isHold' => isset($flight_details["holdAction"]) && $flight_details["holdAction"] == "true",
+                        "pnr" => $pnr_codes ?? []
+                    ];
+                    $emails = Omdr_Email_Manager::get_instance();
+                    $subject = $data["isHold"] ? __('Booking Confirmation', "GFA_HUB") : __('Flight Booked', "GFA_HUB");
+                    $emails->send(
+                        $order->get_billing_email(),
+                        $subject,
+                        'customer-booked-flight',
+                        $data
+                    );
+                } else {
+                    throw new Exception("Flight booking failed. Refunding the order.");
                 }
             }
-            return $result;
         }
 
         public function maybe_confirm_hold_flights($order_id)
@@ -343,65 +430,14 @@ if (!class_exists('Book_Flight')) {
             try {
                 $api = Flights_API::get_instance();
                 $response = $api->flight_revalidation($data);
-                if ($response['code'] == 200) {
-                    // error_log(json_encode($response));
+                if ($response['code'] == 200 && isset($response["data"]["flights"])) {
                     $data["traceId"] = $response["data"]["traceId"];
                 } else {
                     // Other errors - Raise an exception with a user-friendly message
-                    $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', "GFA_HUB"));
+                    $errors->add("flight-revalidation-error", __('Flight revalidation is failed please try another one.', "GFA_HUB"));
                 }
             } catch (Exception $e) {
-                $errors->add("flight-revalidation-error", __('Flight you about to book is now unavailable.', "GFA_HUB"));
-            }
-        }
-
-        private function book_flight($data, $order_id)
-        {
-            try {
-                $api = Flights_API::get_instance();
-                $response = $api->book_flight($data);
-
-                if ($response["code"] != 200) {
-                    error_log(json_encode($response));
-                    $this->process_refund($order_id, 'Flight booking failed. Refunding the order.');
-                } else {
-                    error_log(json_encode($response));
-                    // success case
-                    if (isset($response["data"]["orderId"])) {
-                        $flight_order_id = $response["data"]["orderId"];
-                        update_post_meta($order_id, "flight_orderId", $flight_order_id);
-                        update_post_meta($order_id, "is_flight_booked", true);
-                        // guest user
-                        if (!is_user_logged_in()) {
-                            $guest_token = wp_generate_uuid4();
-                            update_post_meta($order_id, "order_guest_token", $guest_token);
-                        }
-                        // send email with the flight details and link to access it.
-                        $flight_details = get_post_meta($order_id, 'flight_details', true);
-
-                        $order = wc_get_order($order_id);
-                        $data = [
-                            'order' => $order,
-                            'isHold' => isset($flight_details["holdAction"]) && $flight_details["holdAction"] == "true"
-                        ];
-                        $emails = Omdr_Email_Manager::get_instance();
-                        $subject = $data["isHold"] ? __('Booking Confirmation', "GFA_HUB") : __('Flight Booked', "GFA_HUB");
-                        $emails->send(
-                            $order->get_billing_email(),
-                            $subject,
-                            'customer-booked-flight',
-                            $data
-                        );
-                    } else {
-                        error_log("orderrefid not returned form the response");
-                        error_log(json_encode($response));
-                        $this->process_refund($order_id, 'Flight booking failed. Refunding the order.');
-                    }
-                }
-            } catch (Exception $e) {
-                // Log exception details and attempt refund
-                error_log("Flight booking error for order #{$order_id}: " . $e->getMessage());
-                $this->process_refund($order_id, 'An error occurred during flight booking. Refunding the order.');
+                $errors->add("flight-revalidation-error", __('Flight revalidation is failed please try another one.', "GFA_HUB"));
             }
         }
 

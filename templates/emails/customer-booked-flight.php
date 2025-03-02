@@ -8,9 +8,12 @@ do_action('woocommerce_email_header', $email_heading, $to);
 <?php if ($isHold) { ?>
     <p><?php esc_html_e('Your flight has been booked! You have to confirm your flight. For more details, click the link below:', "GFA_HUB"); ?></p>
 <?php } else { ?>
-    <p><?php esc_html_e('Your flight has been booked succsessfully. For more details, click the link below:', "GFA_HUB"); ?></p>
+    <p><?php esc_html_e('Your flight has been booked successfully. For more details, click the link below:', "GFA_HUB"); ?></p>
 <?php } ?>
 <a href="<?php echo esc_url(home_url('booking-details') . '/?order_id=' . $order->get_id() . (!empty($guest_token) ? '&token=' . $guest_token : '')); ?>">
     <?php esc_html_e('View Booking Details', "GFA_HUB"); ?>
 </a>
+<?php if (!empty($pnr)) { ?>
+    <p><?php esc_html_e('and your PNR codes for your flight is' . implode(', ', array_values($pnr)), "GFA_HUB"); ?></p>
+<?php } ?>
 <?php do_action('woocommerce_email_footer', $to); ?>

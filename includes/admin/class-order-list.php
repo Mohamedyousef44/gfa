@@ -17,6 +17,7 @@ if (!class_exists('GFA_Orders_List')) {
         public function list_orders_cols($columns)
         {
             $columns['order_ref_id'] = __('GSF ID', 'GFA');
+            $columns['order_pnr'] = __('PNR Code', 'GFA');
             return $columns;
         }
 
@@ -27,6 +28,14 @@ if (!class_exists('GFA_Orders_List')) {
                     case 'order_ref_id':
                         $flight_orderId = get_post_meta($order->get_id(), 'flight_orderId', true);
                         echo $flight_orderId ? $flight_orderId : "__";
+                        break;
+                    case 'order_pnr':
+                        $pnr_array = get_post_meta($order->get_id(), 'flight_pnr', true);
+                        if (!empty($pnr_array) && is_array($pnr_array)) {
+                            echo implode(', ', array_values($pnr_array));
+                        } else {
+                            echo "__";
+                        }
                         break;
                     default:
                         # code...
